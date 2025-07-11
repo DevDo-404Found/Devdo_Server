@@ -32,7 +32,6 @@ public class GoogleLoginService {
     private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
     private final MemberRepository memberRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     // 구글 액세스 토큰 가져오기
     public String getGoogleAccessToken(String code) {
@@ -60,26 +59,6 @@ public class GoogleLoginService {
         throw new RuntimeException("구글 액세스 토큰을 가져오는데 실패하였습니다.");
     }
 
-    // 로그인, 회원가입
-    public GoogleToken loginOrSignUp(String googleAccessToken) {
-        GoogleUserInfo googleUserInfo = getUserInfo(googleAccessToken); // 사용자 정보 가져오기
-
-        if (!googleUserInfo.getVerifiedEmail()) { // 이메일 인증이 안 된 경우
-            throw new RuntimeException("이메일 인증이 되지 않은 유저입니다.");
-        }
-        // 유저가 존재 x, 새로 생성해서 저장
-        Member member = memberRepository.findByEmail(googleUserInfo.getEmail()).orElseGet(() ->
-                memberRepository.save(Member.builder()
-                        .email(googleUserInfo.getEmail())
-                        .nickname(googleUserInfo.getName())
-                        .pictureUrl(googleUserInfo.getPictureUrl())
-                        .socialType(SocialType.GOOGLE)
-                        .build())
-        );
-        String jwt = jwtTokenProvider.generateToken(member);
-        return new GoogleToken(jwt);
-    }
-
     // 구글 액세스 토큰으로 사용자 정보 갖고오기
     public GoogleUserInfo getUserInfo(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
@@ -101,5 +80,24 @@ public class GoogleLoginService {
 
         // 요청 실패 예외
         throw new RuntimeException("유저 정보를 가져오는데 실패했습니다.");
+    }
+
+    public Member processLogin(String code) {
+        String accessToken = getGoogleAccessToken(code);
+
+        GoogleUserInfo userInfo = getUserInfo(accessToken);
+
+        if (!userInfo.getVerifiedEmail()) {
+            throw new RuntimeException("이메일 인증이 되지 않은 유저입니다.");
+        }
+
+        return memberRepository.findByEmail(userInfo.getEmail()).orElseGet(() ->
+                memberRepository.save(Member.builder()
+                        .email(userInfo.getEmail())
+                        .nickname(userInfo.getName())
+                        .pictureUrl(userInfo.getPictureUrl())
+                        .socialType(SocialType.GOOGLE)
+                        .build())
+        );
     }
 }

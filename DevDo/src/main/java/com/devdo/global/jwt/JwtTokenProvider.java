@@ -9,6 +9,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Slf4j  // 로그 작성
 @Component  // spring bean에 등록
+@Getter
 public class JwtTokenProvider {
 
     private static final String AUTHORITIES_KEY= "auth";
@@ -30,6 +32,9 @@ public class JwtTokenProvider {
 
     @Value("${token.expire.time}")
     private String tokenExpireTime; // 토큰 만료 시간
+
+    @Value("${refresh-token.expire.time}")
+    private String refreshTokenExpireTime;
 
     @Value("${jwt.secret}")
     private String secret;  // 비밀키
@@ -84,11 +89,7 @@ public class JwtTokenProvider {
 
     // 인증 객체 반환
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = parseClaims(token);
 
         // claim 정보를 통해 memberId 추출
         Long memberId = Long.parseLong(claims.getSubject());
@@ -116,4 +117,18 @@ public class JwtTokenProvider {
             return e.getClaims();
         }
     }
+
+    // refreshToken 생성
+    public String generateRefreshToken(Member member) {
+        Date now = new Date();
+        Date expireDate = new Date(now.getTime() + Long.parseLong(refreshTokenExpireTime));
+
+        return Jwts.builder()
+                .subject(member.getMemberId().toString())
+                .issuedAt(now)
+                .expiration(expireDate)
+                .signWith(key, Jwts.SIG.HS256)
+                .compact();
+    }
+
 }

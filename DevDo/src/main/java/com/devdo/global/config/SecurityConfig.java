@@ -29,7 +29,7 @@ public class SecurityConfig {
                 // 세션 정책을 stateless로 설정 -> 서버가 세션을 생성하지 않고 토큰 기반 인증을 사용하도록 설정 = jwt 방식
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/test").permitAll()
-                        .requestMatchers("/api/v1/login/google").permitAll()
+                        .requestMatchers("/api/v1/login/**").permitAll()
                         .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()   // 그 외 모든 요청은 인증 필요
                 )

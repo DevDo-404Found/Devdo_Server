@@ -28,11 +28,18 @@ public class Member {
     @Column(name = "social_type", nullable = false)
     private SocialType socialType;
 
+    private String refreshToken;
+
     @Builder
-    public Member(String nickname, String email, String pictureUrl, SocialType socialType) {
+    public Member(String nickname, String email, String pictureUrl, SocialType socialType, String refreshToken) {
         this.nickname = nickname;
         this.email = email;
         this.pictureUrl = pictureUrl;
         this.socialType = socialType;
+        this.refreshToken = refreshToken;
+    }
+
+    public void saveRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
