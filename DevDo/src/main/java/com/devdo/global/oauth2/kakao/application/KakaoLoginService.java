@@ -1,6 +1,5 @@
 package com.devdo.global.oauth2.kakao.application;
 
-import com.devdo.global.jwt.JwtTokenProvider;
 import com.devdo.global.oauth2.kakao.api.dto.KakaoToken;
 import com.devdo.global.oauth2.kakao.api.dto.KakaoUserInfo;
 import com.devdo.member.domain.Member;
@@ -26,7 +25,6 @@ public class KakaoLoginService {
     private String KAKAO_REDIRECT_URI;
 
     private final MemberRepository memberRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
 
@@ -55,26 +53,6 @@ public class KakaoLoginService {
         }
     }
 
-    // 카카오 로그인 후 JWT 토큰을 반환하는 메소드
-    public KakaoToken signUpOrSignInWithKakao(String kakaoAccessToken) {
-        KakaoUserInfo kakaoUserInfo = getUserInfoFromKakao(kakaoAccessToken);
-
-        if (kakaoUserInfo.getKakao_account() == null || kakaoUserInfo.getKakao_account().getEmail() == null) {
-            throw new RuntimeException("카카오 회원가입 정보가 없습니다.");
-        }
-        // 이메일로 사용자를 찾거나 새로 생성
-        Member member = memberRepository.findByEmail(kakaoUserInfo.getKakao_account().getEmail()).orElseGet(() ->
-                memberRepository.save(Member.builder()
-                        .email(kakaoUserInfo.getKakao_account().getEmail())
-                        .nickname(kakaoUserInfo.getProperties().getNickname())
-                        .pictureUrl(kakaoUserInfo.getKakao_account().getProfile().getProfile_image_url())
-                        .socialType(SocialType.KAKAO)
-                        .build())
-        );
-        String jwt = jwtTokenProvider.generateToken(member);
-        return new KakaoToken(jwt);
-    }
-
     // 카카오 사용자 정보를 가져오는 메소드
     public KakaoUserInfo getUserInfoFromKakao(String accessToken) {
         RestTemplate restTemplate = new RestTemplate();
@@ -95,5 +73,23 @@ public class KakaoLoginService {
             throw new RuntimeException("카카오 사용자 정보 조회에 실패하였습니다." + responseEntity.getStatusCode()
                     + ", Response: " + responseEntity.getBody());
         }
+    }
+    public Member processLogin(String code) {
+        String accessToken = getKakaoAccessToken(code);
+
+        KakaoUserInfo kakaoUserInfo = getUserInfoFromKakao(accessToken);
+
+        if (kakaoUserInfo.getKakao_account() == null || kakaoUserInfo.getKakao_account().getEmail() == null) {
+            throw new RuntimeException("카카오 회원가입 정보가 없습니다.");
+        }
+
+        return memberRepository.findByEmail(kakaoUserInfo.getKakao_account().getEmail()).orElseGet(() ->
+                memberRepository.save(Member.builder()
+                        .email(kakaoUserInfo.getKakao_account().getEmail())
+                        .nickname(kakaoUserInfo.getProperties().getNickname())
+                        .pictureUrl(kakaoUserInfo.getKakao_account().getProfile().getProfile_image_url())
+                        .socialType(SocialType.KAKAO)
+                        .build())
+        );
     }
 }
