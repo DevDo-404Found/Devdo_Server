@@ -42,4 +42,16 @@ public class AuthLoginService {
                 .body(ApiResTemplate.successResponse(SuccessCode.LOGIN_SUCCESS, accessToken));
     }
 
+    public ResponseEntity<ApiResTemplate<String>> reissueAccessToken(String refreshToken) {
+        Member member = memberRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION
+                        , ErrorCode.NO_AUTHORIZATION_EXCEPTION.getMessage()));
+
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "리프레시 토큰이 만료되었습니다.");
+        }
+
+        String newAccessToken = jwtTokenProvider.generateToken(member);
+        return ResponseEntity.ok(ApiResTemplate.successResponse(SuccessCode.REFRESH_TOKEN_SUCCESS, newAccessToken));
+    }
 }

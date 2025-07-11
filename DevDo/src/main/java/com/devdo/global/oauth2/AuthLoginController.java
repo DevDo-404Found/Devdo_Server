@@ -1,5 +1,7 @@
 package com.devdo.global.oauth2;
 
+import com.devdo.common.error.ErrorCode;
+import com.devdo.common.exception.BusinessException;
 import com.devdo.common.template.ApiResTemplate;
 import com.devdo.global.oauth2.google.application.GoogleLoginService;
 import com.devdo.global.oauth2.kakao.application.KakaoLoginService;
@@ -42,4 +44,16 @@ public class AuthLoginController {
         return authLoginService.loginSuccess(member);
     }
 
+    @Operation(summary = "리프레시 토큰으로 액세스 토큰 재발급", description = "쿠키의 리프레시 토큰으로 액세스 토큰을 재발급합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "토큰 재발급에 성공하였습니다."),
+            @ApiResponse(responseCode = "401", description = "리프레시 토큰 없음 또는 만료")
+    })
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<ApiResTemplate<String>> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken) {
+        if (refreshToken == null) {
+            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "리프레시 토큰이 없습니다.");
+        }
+        return authLoginService.reissueAccessToken(refreshToken);
+    }
 }
