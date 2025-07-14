@@ -1,5 +1,6 @@
 package com.devdo.global.oauth2.kakao.application;
 
+import com.devdo.global.nickname.RandomNicknameService;
 import com.devdo.global.oauth2.kakao.api.dto.KakaoToken;
 import com.devdo.global.oauth2.kakao.api.dto.KakaoUserInfo;
 import com.devdo.member.domain.Member;
@@ -24,7 +25,7 @@ public class KakaoLoginService {
     @Value("${kakao.redirect-uri}")
     private String KAKAO_REDIRECT_URI;
 
-    private final MemberRepository memberRepository;
+    private final RandomNicknameService randomNicknameService;
 
     private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
 
@@ -83,13 +84,10 @@ public class KakaoLoginService {
             throw new RuntimeException("카카오 회원가입 정보가 없습니다.");
         }
 
-        return memberRepository.findByEmail(kakaoUserInfo.getKakao_account().getEmail()).orElseGet(() ->
-                memberRepository.save(Member.builder()
-                        .email(kakaoUserInfo.getKakao_account().getEmail())
-                        .nickname(kakaoUserInfo.getProperties().getNickname())
-                        .pictureUrl(kakaoUserInfo.getKakao_account().getProfile().getProfile_image_url())
-                        .socialType(SocialType.KAKAO)
-                        .build())
+        return randomNicknameService.findOrCreateMember(
+                kakaoUserInfo.getKakao_account().getEmail(),
+                kakaoUserInfo.getKakao_account().getProfile().getProfile_image_url(),
+                SocialType.KAKAO
         );
     }
 }
