@@ -36,24 +36,24 @@ public class CommunityController {
     @Operation(method = "PUT", summary = "커뮤니티글 수정", description = "커뮤니티글을 수정합니다.")
     public ApiResTemplate<?> updateCommunity(
             Principal principal,
-            @Valid @RequestParam Long id,
+            @Valid @RequestParam Long communityId,
             @RequestBody CommunityRequestDto commnuityRequestDto
     ) {
-        communityService.updateCommunity(id, commnuityRequestDto, principal);
-        return ApiResTemplate.successResponse(SuccessCode.COMMUNITY_UPDATE_SUCCESS, id);
+        communityService.updateCommunity(communityId, commnuityRequestDto, principal);
+        return ApiResTemplate.successResponse(SuccessCode.COMMUNITY_UPDATE_SUCCESS, communityId);
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", summary = "커뮤니티글 삭제", description = "커뮤니티글을 삭제합니다.")
-    public ApiResTemplate<?> deleteCommunity(Principal principal, @RequestParam Long id) {
-        communityService.deleteCommunity(id, principal);
-        return ApiResTemplate.successResponse(SuccessCode.COMMUNITY_DELETE_SUCCESS, id);
+    public ApiResTemplate<?> deleteCommunity(Principal principal, @RequestParam Long communityId) {
+        communityService.deleteCommunity(communityId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.COMMUNITY_DELETE_SUCCESS, communityId);
     }
 
     @GetMapping("/detail")
     @Operation(summary = "커뮤니티글 한 개 조회", description = "커뮤니티글 한 개를 조회합니다.")
-    public ApiResTemplate<CommunityDetailResponseDto> getCommunity(@RequestParam Long id) {
-        Community community = communityService.getCommunity(id);
+    public ApiResTemplate<CommunityDetailResponseDto> getCommunity(@RequestParam Long communityId) {
+        Community community = communityService.getCommunity(communityId);
         CommunityDetailResponseDto communityDetailResponseDto = CommunityDetailResponseDto.from(community);
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityDetailResponseDto);
     }

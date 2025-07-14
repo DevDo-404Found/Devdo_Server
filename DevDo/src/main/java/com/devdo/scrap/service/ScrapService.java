@@ -1,12 +1,13 @@
-package com.devdo.community.service;
+package com.devdo.scrap.service;
 
 import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
-import com.devdo.community.controller.dto.request.CommunityRequestDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
+import com.devdo.scrap.controller.dto.ScrapResponseDto;
+import com.devdo.scrap.entity.Scrap;
 import com.devdo.scrap.repository.ScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CommunityService {
+public class ScrapService {
 
     private final CommunityRepository communityRepository;
     private final MemberRepository memberRepository;
@@ -53,65 +55,49 @@ public class CommunityService {
     }
 
     @Transactional
-    public Long createCommunity(CommunityRequestDto commnuityRequestDto, Principal principal) {
+    public Long saveScrap(Long id, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
+        Community community = findCommunityById(id);
 
-        Community community = Community.builder()
-                .title(commnuityRequestDto.title())
-                .content(commnuityRequestDto.content())
+        if (scrapRepository.existsByMemberAndCommunity(member, community)) {
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS_EMAIL, "이미 스크랩한 게시글입니다.");
+        }
+
+        Scrap scrap = Scrap.builder()
                 .member(member)
+                .community(community)
                 .build();
 
-        return communityRepository.save(community).getId();
+        community.increaseScrapCount();
+
+        return scrapRepository.save(scrap).getId();
     }
 
     @Transactional
-    public Community updateCommunity(Long communityId, CommunityRequestDto commnuityRequestDto, Principal principal) {
+    public void deletesScrap(Long communityId, Principal principal) {
+        Member member = getMemberFromPrincipal(principal);
         Community community = findCommunityById(communityId);
-        Member member = getMemberFromPrincipal(principal);
 
-        if (!community.getMember().getMemberId().equals(member.getMemberId())) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, ErrorCode.NO_AUTHORIZATION_EXCEPTION.getMessage());
-        }
+        Scrap scrap = scrapRepository.findByMemberAndCommunity(member, community)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, ErrorCode.NO_AUTHORIZATION_EXCEPTION.getMessage()));
 
-        community.update(commnuityRequestDto);
-        return community;
+        community.decreaseScrapCount();
+
+        scrapRepository.delete(scrap);
     }
 
-    @Transactional
-    public void deleteCommunity(Long communityId, Principal principal) {
+    @Transactional(readOnly = true)
+    public Long getScrapCount(Long communityId) {
         Community community = findCommunityById(communityId);
+        return community.getScrapCount();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ScrapResponseDto> getMyScraps(Principal principal) {
         Member member = getMemberFromPrincipal(principal);
-
-        if (!community.getMember().getMemberId().equals(member.getMemberId())) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, ErrorCode.NO_AUTHORIZATION_EXCEPTION.getMessage());
-        }
-
-        // Scrap 먼저 삭제
-        scrapRepository.deleteAllByCommunity(community);
-
-        communityRepository.delete(community);
-    }
-
-    @Transactional(readOnly = true)
-    public Community getCommunity(Long id) {
-        return communityRepository.findWithMemberById(id)
-                .orElseThrow(() -> new BusinessException(ErrorCode.COMMUNITY_NOT_FOUND_EXCEPTION, ErrorCode.COMMUNITY_NOT_FOUND_EXCEPTION.getMessage() + id));
-    }
-
-    @Transactional(readOnly = true)
-    public List<Community> getAllCommunities() {
-        return communityRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Community> getMyCommunities(Principal principal) {
-        Member member = getMemberFromPrincipal(principal);
-        return communityRepository.findAllByMember_MemberId(member.getMemberId());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Community> searchCommunitiesByTitle(String keyword) {
-        return communityRepository.findByTitleContainingIgnoreCase(keyword);
+        return scrapRepository.findAllByMember(member)
+                .stream()
+                .map(ScrapResponseDto::from)
+                .collect(Collectors.toList());
     }
 }
