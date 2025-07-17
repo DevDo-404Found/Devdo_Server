@@ -20,6 +20,7 @@ public class AuthLoginService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
 
+    // refreshToken 저장
     public ResponseEntity<ApiResTemplate<String>> loginSuccess(Member member) {
         String accessToken = jwtTokenProvider.generateToken(member);
         String refreshToken = jwtTokenProvider.generateRefreshToken(member);
@@ -42,6 +43,7 @@ public class AuthLoginService {
                 .body(ApiResTemplate.successResponse(SuccessCode.LOGIN_SUCCESS, accessToken));
     }
 
+    // refreshToken으로 새로운 accessToken 생성
     public ResponseEntity<ApiResTemplate<String>> reissueAccessToken(String refreshToken) {
         Member member = memberRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION
