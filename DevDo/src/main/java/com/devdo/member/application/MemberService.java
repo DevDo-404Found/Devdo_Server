@@ -2,6 +2,7 @@ package com.devdo.member.application;
 
 import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
+import com.devdo.member.api.dto.MemberInfoUpdateReqDto;
 import com.devdo.member.api.dto.response.MemberInfoResDto;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
@@ -26,7 +27,28 @@ public class MemberService {
         return MemberInfoResDto.from(member);
     }
 
-    // Todo: member 정보 수정
+    // 마이페이지 - 내 프로필 수정
+    @Transactional
+    public MemberInfoResDto updateMemberInfo(MemberInfoUpdateReqDto memberInfoUpdateReqDto, Principal principal) {
+        Long id = Long.parseLong(principal.getName());
+        Member member = getMemberById(id);
+
+        // nickname update
+        member.updateNickname(memberInfoUpdateReqDto.nickname());
+
+        String newPictureUrl = memberInfoUpdateReqDto.pictureUrl();
+
+        if ("string".equals(newPictureUrl)) {
+            // 기존 url 유지
+        } else if (newPictureUrl == null || newPictureUrl.isBlank()) {
+            // null 또는 빈 문자열일 때는 프로필 삭제
+            member.updatePictureUrl(null);
+        } else {
+            member.updatePictureUrl(newPictureUrl);
+        }
+
+        return MemberInfoResDto.from(member);
+    }
 
     // entity 찾는 공통 메소드
     private Member getMemberById(Long memberId) {

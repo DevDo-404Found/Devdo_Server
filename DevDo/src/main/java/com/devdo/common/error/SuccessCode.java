@@ -14,7 +14,7 @@ public enum SuccessCode {
     LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공하였습니다."),
     FOLLOW_SUCCESS(HttpStatus.OK,"팔로우 요청에 성공하였습니다."),
     FOLLOW_DELETE_SUCCESS(HttpStatus.OK,"언팔로우 요청에 성공하였습니다."),
-    MEMBER_UPDATE_SUCCESS(HttpStatus.OK, "사용자가 성공적으로 수정되었습니다."),
+    MEMBER_INFO_UPDATE_SUCCESS(HttpStatus.OK, "사용자의 정보가 성공적으로 수정되었습니다."),
     COMMUNITY_UPDATE_SUCCESS(HttpStatus.OK, "글이 성공적으로 수정되었습니다."),
     MEMBER_DELETE_SUCCESS(HttpStatus.OK, "사용자가 성공적으로 삭제되었습니다."),
     COMMUNITY_DELETE_SUCCESS(HttpStatus.OK, "글이 성공적으로 삭제되었습니다."),

@@ -64,6 +64,14 @@ public class Member {
         this.followerCount = Math.max(0, this.followerCount + count);
     }
 
+    // mypage profile update
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+    public void updatePictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
+
     public void saveRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
