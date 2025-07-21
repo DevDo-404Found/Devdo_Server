@@ -36,15 +36,10 @@ public class MemberService {
         // nickname update
         member.updateNickname(memberInfoUpdateReqDto.nickname());
 
+        // pictureUrl 삭제
         String newPictureUrl = memberInfoUpdateReqDto.pictureUrl();
-
-        if ("string".equals(newPictureUrl)) {
-            // 기존 url 유지
-        } else if (newPictureUrl == null || newPictureUrl.isBlank()) {
-            // null 또는 빈 문자열일 때는 프로필 삭제
+        if (newPictureUrl == null || newPictureUrl.isBlank()) {
             member.updatePictureUrl(null);
-        } else {
-            member.updatePictureUrl(newPictureUrl);
         }
 
         return MemberInfoResDto.from(member);
