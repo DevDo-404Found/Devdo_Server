@@ -7,6 +7,10 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+import com.devdo.follow.domain.Follow;
+
 @Entity
 @Getter
 @Builder
@@ -31,6 +35,18 @@ public class Member {
     @Column(name = "social_type", nullable = false)
     private SocialType socialType;
 
+    @OneToMany(mappedBy = "fromMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> following = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followers = new ArrayList<>();
+
+    @Column(name = "follower_count")
+    private int followerCount = 0;
+
+    @Column(name = "following_count")
+    private int followingCount = 0;
+
     private String refreshToken;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -43,6 +59,15 @@ public class Member {
         this.pictureUrl = pictureUrl;
         this.socialType = socialType;
         this.refreshToken = refreshToken;
+    }
+
+    // follow count update
+    public void updateFollowingCount(int count) {
+        this.followingCount = Math.max(0, this.followingCount + count);
+    }
+
+    public void updateFollowerCount(int count) {
+        this.followerCount = Math.max(0, this.followerCount + count);
     }
 
     public void saveRefreshToken(String refreshToken) {

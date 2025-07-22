@@ -1,11 +1,10 @@
 package com.devdo.global.oauth2.google.application;
 
-import com.devdo.global.jwt.JwtTokenProvider;
+import com.devdo.global.nickname.RandomNicknameService;
 import com.devdo.global.oauth2.google.api.dto.GoogleToken;
 import com.devdo.global.oauth2.google.api.dto.GoogleUserInfo;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.SocialType;
-import com.devdo.member.domain.repository.MemberRepository;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +30,7 @@ public class GoogleLoginService {
 
     private final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
-    private final MemberRepository memberRepository;
+    private final RandomNicknameService randomNicknameService;
 
     // 구글 액세스 토큰 가져오기
     public String getGoogleAccessToken(String code) {
@@ -91,13 +90,10 @@ public class GoogleLoginService {
             throw new RuntimeException("이메일 인증이 되지 않은 유저입니다.");
         }
 
-        return memberRepository.findByEmail(userInfo.getEmail()).orElseGet(() ->
-                memberRepository.save(Member.builder()
-                        .email(userInfo.getEmail())
-                        .nickname(userInfo.getName())
-                        .pictureUrl(userInfo.getPictureUrl())
-                        .socialType(SocialType.GOOGLE)
-                        .build())
+        return randomNicknameService.findOrCreateMember(
+                userInfo.getEmail(),
+                userInfo.getPictureUrl(),
+                SocialType.GOOGLE
         );
     }
 }
