@@ -14,6 +14,7 @@ public enum ErrorCode {
     CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "자기 자신은 팔로우할 수 없습니다.", "BAD_REQUEST_400"),
     NOT_FOLLOW_STATE(HttpStatus.BAD_REQUEST, "팔로우 상태가 아닙니다.", "BAD_REQUEST_400"),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "유효성 검사에 실패하였습니다.", "BAD_REQUEST_400"),
+    ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다.", "BAD_REQUEST_400"),
     ALREADY_EXISTS_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.", "BAD_REQUEST_400"),
     NO_AUTHORIZATION_EXCEPTION(HttpStatus.BAD_REQUEST, "권한이 없습니다.", "BAD_REQUEST_400"),
 
