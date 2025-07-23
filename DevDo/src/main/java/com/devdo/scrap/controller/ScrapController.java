@@ -23,18 +23,18 @@ public class ScrapController {
 
     @PostMapping
     @Operation(method = "POST", summary = "스크랩 추가", description = "스크랩을 추가합니다.")
-    public ApiResTemplate<?> addScrap(@RequestParam Long communityId,
+    public ApiResTemplate<String> addScrap(@RequestParam Long communityId,
                                               Principal principal) {
         scrapService.saveScrap(communityId, principal);
-        return ApiResTemplate.successResponse(SuccessCode.SCRAP_SAVE_SUCCESS, communityId);
+        return ApiResTemplate.successResponse(SuccessCode.SCRAP_SAVE_SUCCESS, "communityId : " + communityId + ", 스크랩 추가 완료");
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", summary = "스크랩 삭제", description = "스크랩을 삭제합니다.")
-    public ApiResTemplate<?> deleteScrap(@RequestParam Long communityId,
+    public ApiResTemplate<String> deleteScrap(@RequestParam Long communityId,
                                                  Principal principal) {
         scrapService.deletesScrap(communityId, principal);
-        return ApiResTemplate.successResponse(SuccessCode.SCRAP_DELETE_SUCCESS, communityId);
+        return ApiResTemplate.successResponse(SuccessCode.SCRAP_DELETE_SUCCESS, "communityId : " + communityId + ", 스크랩 삭제 완료");
     }
 
     @GetMapping
@@ -45,8 +45,8 @@ public class ScrapController {
 
     @GetMapping("/count")
     @Operation(method = "GET", summary = "커뮤니티글의 스크랩 수 조회", description = "해당 커뮤니티 글의 스크랩 개수를 조회합니다.")
-    public ApiResTemplate<?> getScrapCount(@RequestParam Long communityId) {
+    public ApiResTemplate<String> getScrapCount(@RequestParam Long communityId) {
         Long scrapCount = scrapService.getScrapCount(communityId);
-        return ApiResTemplate.successResponse(SuccessCode.SCRAP_COUNT_SUCCESS, scrapCount);
+        return ApiResTemplate.successResponse(SuccessCode.SCRAP_COUNT_SUCCESS, "스크랩 수 : " + scrapCount);
     }
 }

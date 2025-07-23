@@ -23,6 +23,7 @@ public class CommunityService {
     private final MemberRepository memberRepository;
     private final ScrapRepository scrapRepository;
 
+    // 공통 메서드
     @Transactional
     public Community findCommunityById(Long id) {
         return communityRepository.findById(id)
@@ -52,6 +53,7 @@ public class CommunityService {
         }
     }
 
+    // 주요 서비스 메서드
     @Transactional
     public Long createCommunity(CommunityRequestDto commnuityRequestDto, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
