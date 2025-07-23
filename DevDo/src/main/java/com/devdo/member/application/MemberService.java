@@ -2,7 +2,7 @@ package com.devdo.member.application;
 
 import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
-import com.devdo.member.api.dto.MemberInfoUpdateReqDto;
+import com.devdo.member.api.dto.request.MemberInfoUpdateReqDto;
 import com.devdo.member.api.dto.response.MemberInfoResDto;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
@@ -32,6 +32,17 @@ public class MemberService {
     public MemberInfoResDto updateMemberInfo(MemberInfoUpdateReqDto memberInfoUpdateReqDto, Principal principal) {
         Long id = Long.parseLong(principal.getName());
         Member member = getMemberById(id);
+
+        String newNickname = memberInfoUpdateReqDto.nickname();
+
+        // nickname 중복 예외
+        if (!member.getNickname().equals(newNickname)) {
+            if (memberRepository.existsByNickname(newNickname)) {
+                throw new BusinessException(ErrorCode.ALREADY_EXISTS_NICKNAME,
+                        ErrorCode.ALREADY_EXISTS_NICKNAME.getMessage());
+            }
+            member.updateNickname(newNickname);
+        }
 
         // nickname update
         member.updateNickname(memberInfoUpdateReqDto.nickname());
