@@ -33,11 +33,14 @@ public class CommentService {
     // 댓글 전체 조회
     public CommentListResDto getCommentList(Long communityId, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
-        List<Comment> comments = commentRepository.findAllByCommunity_Id(communityId);
+        getCommunity(communityId);
+
+        // 댓글 전체 리스트 조회
+        List<Comment> parentComments = commentRepository.findParentCommentsWithChildComments(communityId);
 
         // 댓글 개수 조회
         int totalCount = commentRepository.countByCommunity_Id(communityId);
-        return CommentListResDto.from(totalCount, comments , member);
+        return CommentListResDto.from(totalCount, parentComments, member);
     }
 
     // 댓글 생성
@@ -46,11 +49,25 @@ public class CommentService {
         Member member = getMemberFromPrincipal(principal);
         Community community = getCommunity(communityId);
 
+        Comment parentComment = null;
+        // 부모 댓글에 자식 댓글을 작성하는 경우
+        if (commentSaveReqDto.parentCommentId() != null) {
+            // 부모 댓글의 id 설정
+            parentComment = getComment(commentSaveReqDto.parentCommentId());
+
+            // 자식 댓글의 자식 댓글 작성 방지: 부모 - 댓글 2단계로만 설정
+            if (parentComment.getParentComment() != null) {
+                throw new BusinessException(ErrorCode.NOT_CHILD_COMMENT_HIERARCHY
+                        , ErrorCode.NOT_CHILD_COMMENT_HIERARCHY.getMessage());
+            }
+        }
+
         // 댓글 생성
         Comment comment = Comment.builder()
                 .content(commentSaveReqDto.content())
                 .community(community)
                 .member(member)
+                .parentComment(parentComment)
                 .build();
 
         Comment savedComment = commentRepository.save(comment);

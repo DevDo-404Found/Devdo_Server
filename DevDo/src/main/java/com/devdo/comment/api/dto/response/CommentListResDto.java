@@ -6,6 +6,7 @@ import com.devdo.member.domain.Member;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// 부모 댓글 리스트 + 자식 댓글 리스트
 public record CommentListResDto(
         int totalCommentCount,
         List<CommentInfoResDto> commentInfoResDtos
