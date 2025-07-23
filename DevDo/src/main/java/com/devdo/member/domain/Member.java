@@ -1,10 +1,11 @@
 package com.devdo.member.domain;
 
+import com.devdo.scrap.entity.Scrap;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ import com.devdo.follow.domain.Follow;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
@@ -45,6 +48,9 @@ public class Member {
     private int followingCount = 0;
 
     private String refreshToken;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Scrap> scraps = new ArrayList<>();
 
     @Builder
     public Member(String nickname, String email, String pictureUrl, SocialType socialType, String refreshToken) {
