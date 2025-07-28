@@ -3,13 +3,10 @@ package com.devdo.member.domain;
 import com.devdo.scrap.entity.Scrap;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import java.util.ArrayList;
 import java.util.List;
 import com.devdo.follow.domain.Follow;
+import com.devdo.comment.domain.Comment;
 
 @Entity
 @Getter
@@ -49,6 +46,9 @@ public class Member {
 
     private String refreshToken;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();
 
@@ -65,7 +65,6 @@ public class Member {
     public void updateFollowingCount(int count) {
         this.followingCount = Math.max(0, this.followingCount + count);
     }
-
     public void updateFollowerCount(int count) {
         this.followerCount = Math.max(0, this.followerCount + count);
     }

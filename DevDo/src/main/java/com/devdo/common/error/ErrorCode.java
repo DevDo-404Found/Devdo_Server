@@ -14,6 +14,7 @@ public enum ErrorCode {
     CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "자기 자신은 팔로우할 수 없습니다.", "BAD_REQUEST_400"),
     NOT_FOLLOW_STATE(HttpStatus.BAD_REQUEST, "팔로우 상태가 아닙니다.", "BAD_REQUEST_400"),
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "유효성 검사에 실패하였습니다.", "BAD_REQUEST_400"),
+    NOT_CHILD_COMMENT_HIERARCHY(HttpStatus.BAD_REQUEST, "대댓글의 대댓글은 허용하지 않습니다.", "BAD_REQUEST_400"),
     ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다.", "BAD_REQUEST_400"),
     ALREADY_EXISTS_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.", "BAD_REQUEST_400"),
     NO_AUTHORIZATION_EXCEPTION(HttpStatus.BAD_REQUEST, "권한이 없습니다.", "BAD_REQUEST_400"),
@@ -22,6 +23,7 @@ public enum ErrorCode {
     FORBIDDEN_EXCEPTION(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.", "FORBIDDEN_403"),
 
     // 404 NOT FOUND
+    COMMENT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "해당 댓글이 없습니다. commentId = ", "NOT_FOUND_404"),
     MEMBER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "해당 사용자가 없습니다. memberId = ", "NOT_FOUND_404"),
     COMMUNITY_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "해당 게시글이 없습니다. communityId = ", "NOT_FOUND_404"),
 
