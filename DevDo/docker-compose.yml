@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  backend:
+    image: ttttkii91333/devdo1
+    container_name: devdo1-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    restart: always
+
+  redis:
+    image: redis:7.2
+    container_name: devdo1-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+
+volumes:
+  redis-data:
