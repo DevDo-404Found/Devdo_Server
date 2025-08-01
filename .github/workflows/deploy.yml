@@ -19,9 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Change to project directory
-        run: cd DevDo
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -35,7 +32,7 @@ jobs:
           OCCUPY_SECRET_DIR_FILE_NAME: application-prod.yml
         run: echo $OCCUPY_SECRET | base64 --decode > $OCCUPY_SECRET_DIR/$OCCUPY_SECRET_DIR_FILE_NAME
 
-      - name: gradlew mod modify
+      - name: Gradle 권한 설정
         run: |
           cd DevDo
           chmod +x gradlew
@@ -88,8 +85,17 @@ jobs:
         run: |
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32 || true
 
-      # AWS EC2 Server Connect & Docker 명령어 실행 (8)
-      - name: AWS EC2 Connection
+      - name: Copy docker-compose.yml to EC2
+        uses: appleboy/scp-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          source: "DevDo/docker-compose.yml"
+          target: "/home/ec2-user/app"
+
+      - name: SSH 접속하여 docker-compose 실행
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -98,13 +104,14 @@ jobs:
           port: 22
           timeout: 60s
           script: |
-            sudo docker stop devdo1-app
-            sudo docker rm devdo1-app
-            sudo docker rmi ttttkii91333/devdo1
+            cd /home/ec2-user/app/DevDo
+            sudo docker stop devdo1-server || true
+            sudo docker rm devdo1-server || true            
+            sudo docker-compose down
+            sleep 2
             sudo docker pull ttttkii91333/devdo1
-            sudo docker run -it -d -p 8080:8080 --name devdo1-app ttttkii91333/devdo1
+            sudo docker-compose up -d
 
-      # REMOVE GitHub IP FROM security group (9)
-      - name: Remove IP FROM security group
+      - name: Remove GitHub IP from SG
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32 || true
