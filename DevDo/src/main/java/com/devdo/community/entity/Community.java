@@ -74,6 +74,11 @@ public class Community {
         if (this.scrapCount > 0) this.scrapCount--;
     }
 
+    // 조회수 관련
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
     public void update(CommunityRequestDto commnuityRequestDto) {
         if (commnuityRequestDto.title() != null) this.title = commnuityRequestDto.title();
         if (commnuityRequestDto.content() != null) this.content = commnuityRequestDto.content();

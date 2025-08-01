@@ -9,10 +9,12 @@ import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import com.devdo.scrap.repository.ScrapRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -22,6 +24,7 @@ public class CommunityService {
     private final CommunityRepository communityRepository;
     private final MemberRepository memberRepository;
     private final ScrapRepository scrapRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
     // 공통 메서드
     @Transactional
@@ -115,5 +118,24 @@ public class CommunityService {
     @Transactional(readOnly = true)
     public List<Community> searchCommunitiesByTitle(String keyword) {
         return communityRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+
+    // Redis 조회수
+    @Transactional
+    public Community getCommunityWithRedisViewCount(Long communityId, Principal principal) {
+        Community community = getCommunity(communityId);
+        String memberId = principal.getName();
+
+        // redisKey 생성
+        String redisKey = "community:view:" + memberId + ":" + communityId;
+
+        Boolean hasViewed = stringRedisTemplate.hasKey(redisKey);
+        if (hasViewed == null || !hasViewed) {
+            community.increaseViewCount();
+
+            // 24시간 후 만료
+            stringRedisTemplate.opsForValue().set(redisKey, "1", Duration.ofHours(24));
+        }
+        return community;
     }
 }
