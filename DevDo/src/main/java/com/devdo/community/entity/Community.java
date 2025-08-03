@@ -1,6 +1,7 @@
 package com.devdo.community.entity;
 
 import com.devdo.community.controller.dto.request.CommunityRequestDto;
+import com.devdo.like.domain.Like;
 import com.devdo.member.domain.Member;
 import com.devdo.scrap.entity.Scrap;
 import jakarta.persistence.*;
@@ -48,6 +49,9 @@ public class Community {
     @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();
 
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
+
     // 자동 생성
     @PrePersist
     public void prePersist() {
@@ -77,6 +81,11 @@ public class Community {
     // 조회수 관련
     public void increaseViewCount() {
         this.viewCount++;
+    }
+
+    // 좋아요 개수 관련
+    public void updateLikeCount(int count) {
+        this.likeCount = Math.max(0, this.likeCount + count);
     }
 
     public void update(CommunityRequestDto commnuityRequestDto) {
