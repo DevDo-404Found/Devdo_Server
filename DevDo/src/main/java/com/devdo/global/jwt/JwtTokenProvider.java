@@ -74,16 +74,18 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token);  // 토큰 파싱, 검증
             return true;    // 검증 완료 -> 유효한 토큰
             // 검증 실패 시 반환하는 예외에 따라 다르게 실행
-        } catch (UnsupportedJwtException | MalformedJwtException e) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "JWT 가 유효하지 않습니다.");
-        } catch (SignatureException e) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "JWT 서명 검증에 실패했습니다.");
         } catch (ExpiredJwtException e) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "JWT 가 만료되었습니다.");
+            throw new BusinessException(ErrorCode.JWT_EXPIRED, "JWT가 만료되었습니다.");
+        } catch (UnsupportedJwtException e) {
+            throw new BusinessException(ErrorCode.JWT_UNSUPPORTED, "지원하지 않는 JWT 형식입니다.");
+        } catch (MalformedJwtException e) {
+            throw new BusinessException(ErrorCode.JWT_MALFORMED, "잘못된 JWT 토큰입니다.");
+        } catch (SignatureException e) {
+            throw new BusinessException(ErrorCode.JWT_SIGNATURE_INVALID, "JWT 서명 검증에 실패했습니다.");
         } catch (IllegalArgumentException e) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "JWT 가 null 이거나 비어있거나 공백만 있습니다.");
+            throw new BusinessException(ErrorCode.INVALID_JWT, "JWT가 비어있거나 잘못된 값입니다.");
         } catch (Exception e) {
-            throw new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, "JWT 검증에 실패했습니다.");
+            throw new BusinessException(ErrorCode.JWT_VALIDATION_FAILED, "JWT 검증에 실패했습니다.");
         }
     }
 
