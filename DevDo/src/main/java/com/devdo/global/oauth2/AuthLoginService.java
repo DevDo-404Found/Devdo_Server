@@ -35,7 +35,7 @@ public class AuthLoginService {
                 .secure(true)
                 .path("/")
                 .maxAge(Long.parseLong(jwtTokenProvider.getRefreshTokenExpireTime()) / 1000)
-                .sameSite("Strict")
+                .sameSite("None")
                 .build();
 
         return ResponseEntity.ok()
