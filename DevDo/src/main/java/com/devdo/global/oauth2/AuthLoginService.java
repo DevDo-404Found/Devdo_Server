@@ -8,17 +8,26 @@ import com.devdo.global.jwt.JwtTokenProvider;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthLoginService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+
+    @Value("${jwt.cookieSecure}")
+    private boolean cookieSecure;
+
+    @Value("${jwt.cookieSameSite}")
+    private String cookieSameSite;
 
     // refreshToken 저장
     public ResponseEntity<ApiResTemplate<String>> loginSuccess(Member member) {
@@ -32,11 +41,14 @@ public class AuthLoginService {
         // HttpOnly 쿠키로 리프레시 토큰 전달
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .path("/")
                 .maxAge(Long.parseLong(jwtTokenProvider.getRefreshTokenExpireTime()) / 1000)
-                .sameSite("None")
+                .sameSite(cookieSameSite)
                 .build();
+
+        System.out.println("cookieSecure = " + cookieSecure);
+        System.out.println("cookieSameSite = " + cookieSameSite);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
