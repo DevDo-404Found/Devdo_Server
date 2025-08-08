@@ -1,10 +1,12 @@
 package com.devdo.global.jwt;
 
+import com.devdo.common.exception.BusinessException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,15 +24,24 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
 
     // 모든 요청이 들어올 때 필터가 가로채 인증 로직 실행
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
-            IOException, ServletException {
-        String token = resolveToken((HttpServletRequest) request); // 요청에서 토큰 resolve(추출)
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {   // 토큰이 유효한지 확인
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);  // 유효하다면 토큰으로부터 인증 정보 가져옴
-            SecurityContextHolder.getContext().setAuthentication(authentication);   // SecurityContext에 인증 정보 저장 -> 이후 요청 처리에서 인증된 사용자 정보에 접근할 수 있음
+        try {
+            String token = resolveToken(httpRequest);
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            chain.doFilter(request, response);
+
+        } catch (BusinessException ex) {
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResponse.setContentType("application/json;charset=UTF-8");
+            String json = String.format("{\"code\":\"%s\", \"message\":\"%s\"}", ex.getErrorCode().getCode(), ex.getMessage());
+            httpResponse.getWriter().write(json);
         }
-        chain.doFilter(request, response); // 필터 체인의 다음 필터로 요청 넘기기
     }
 
     // 요청에서 토큰 추출 메소드
