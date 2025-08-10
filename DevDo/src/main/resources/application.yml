@@ -37,3 +37,7 @@ google:
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-uri: ${KAKAO_REDIRECT_URI}
+
+gemini:
+  api:
+    key: ${gemini.api.key}
