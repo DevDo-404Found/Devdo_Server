@@ -10,6 +10,7 @@ import com.devdo.common.template.ApiResTemplate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class CommentController {
     })
     @PostMapping
     public ApiResTemplate<CommentInfoResDto> saveComment(@RequestParam Long communityId,
-                                              @RequestBody CommentSaveReqDto commentSaveReqDto,
+                                              @Valid @RequestBody CommentSaveReqDto commentSaveReqDto,
                                               Principal principal) {
         CommentInfoResDto commentInfoResDto = commentService.saveComment(communityId, commentSaveReqDto, principal);
         return ApiResTemplate.successResponse(SuccessCode.COMMENT_SAVE_SUCCESS, commentInfoResDto);
@@ -53,7 +54,7 @@ public class CommentController {
     })
     @PutMapping
     public ApiResTemplate<CommentInfoResDto> updateComment(@RequestParam Long commentId,
-                                                           @RequestBody CommentUpdateReqDto commentUpdateReqDto,
+                                                           @Valid @RequestBody CommentUpdateReqDto commentUpdateReqDto,
                                                            Principal principal) {
         CommentInfoResDto commentInfoResDto = commentService.updateComment(commentId, commentUpdateReqDto, principal);
         return ApiResTemplate.successResponse(SuccessCode.COMMENT_UPDATE_SUCCESS, commentInfoResDto);
