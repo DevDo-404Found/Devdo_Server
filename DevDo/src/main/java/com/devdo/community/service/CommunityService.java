@@ -144,6 +144,12 @@ public class CommunityService {
                 .toList();
     }
 
+    // 댓글 개수
+    @Transactional(readOnly = true)
+    public int getCommentCountByCommunityId(Long communityId) {
+        return commentRepository.countByCommunity_Id(communityId);
+    }
+
     // Redis 조회수
     @Transactional
     public Community getCommunityWithRedisViewCount(Long communityId, Principal principal) {

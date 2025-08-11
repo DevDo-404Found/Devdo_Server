@@ -52,11 +52,21 @@ public class CommunityController {
 
     @GetMapping("/detail")
     @Operation(summary = "커뮤니티글 한 개 조회", description = "커뮤니티글 한 개를 조회합니다.")
-    public ApiResTemplate<CommunityDetailResponseDto> getCommunity(@RequestParam Long communityId, Principal principal) {
+    public ApiResTemplate<CommunityDetailResponseDto> getCommunity(
+            @RequestParam Long communityId,
+            Principal principal
+    ) {
         Community community = communityService.getCommunityWithRedisViewCount(communityId, principal);
-        CommunityDetailResponseDto communityDetailResponseDto = CommunityDetailResponseDto.from(community);
+
+        // 댓글 개수 계산
+        int commentCount = communityService.getCommentCountByCommunityId(communityId);
+
+        CommunityDetailResponseDto communityDetailResponseDto =
+                CommunityDetailResponseDto.from(community, commentCount);
+
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityDetailResponseDto);
     }
+
 
     @GetMapping
     @Operation(method = "GET", summary = "커뮤니티글 전체 조회", description = "전체 커뮤니티글을 조회합니다.")
