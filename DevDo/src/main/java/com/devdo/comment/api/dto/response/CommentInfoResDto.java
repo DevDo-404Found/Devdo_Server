@@ -1,6 +1,7 @@
 package com.devdo.comment.api.dto.response;
 
 import com.devdo.comment.domain.Comment;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +12,7 @@ public record CommentInfoResDto(
         Long commentId,
         Long communityId,
         String content,
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         LocalDateTime commentCreatedAt,
         String writerNickname,
         String writerPictureUrl,
