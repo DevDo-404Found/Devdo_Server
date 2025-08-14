@@ -1,5 +1,7 @@
 package com.devdo.roadmap.service;
 
+import com.devdo.common.error.ErrorCode;
+import com.devdo.common.exception.BusinessException;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import com.devdo.roadmap.controller.dto.request.RoadmapRequestDto;
@@ -24,7 +26,7 @@ public class RoadmapService {
     @Transactional
     public Long createRoadmap(RoadmapRequestDto requestDto, Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND_EXCEPTION, ErrorCode.MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         Roadmap roadmap = Roadmap.builder()
                 .title(requestDto.title())

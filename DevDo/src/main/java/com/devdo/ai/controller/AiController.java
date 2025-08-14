@@ -3,6 +3,8 @@ package com.devdo.ai.controller;
 
 import com.devdo.ai.controller.dto.AiRequestDto;
 import com.devdo.ai.service.AiService;
+import com.devdo.common.error.SuccessCode;
+import com.devdo.common.template.ApiResTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +19,11 @@ public class AiController {
     }
 
     @PostMapping("/node/detail/{nodeId}")
-    public ResponseEntity<String> generateContent(
+    public ApiResTemplate<String> generateContent(
             @PathVariable Long nodeId,
             @RequestParam String queryType) {
         String result = aiService.generateContentByNode(nodeId, queryType);
-        return ResponseEntity.ok(result);
+        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, result);
     }
 }
 
