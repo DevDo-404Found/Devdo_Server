@@ -1,5 +1,6 @@
 package com.devdo.member.domain;
 
+import com.devdo.like.domain.Like;
 import com.devdo.scrap.entity.Scrap;
 import jakarta.persistence.*;
 import lombok.*;
@@ -51,6 +52,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
     @Builder
     public Member(String nickname, String email, String pictureUrl, SocialType socialType, String refreshToken) {

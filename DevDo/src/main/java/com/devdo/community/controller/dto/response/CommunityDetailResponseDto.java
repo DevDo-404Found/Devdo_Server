@@ -12,11 +12,11 @@ public record CommunityDetailResponseDto(
         String content,
         LocalDateTime createdAt,
         Long viewCount,
-        Long viewLike
+        Long viewLike,
 
-        // Todo: 댓글 개수 추가하기
+        int commentCount // 댓글 개수
 ) {
-    public static CommunityDetailResponseDto from(Community community) {
+    public static CommunityDetailResponseDto from(Community community, int commentCount) {
         Member member = community.getMember();
 
         return new CommunityDetailResponseDto(
@@ -26,7 +26,8 @@ public record CommunityDetailResponseDto(
                 community.getContent(),
                 community.getCreatedAt(),
                 community.getViewCount(),
-                community.getLikeCount()
+                community.getLikeCount(),
+                commentCount
         );
     }
 }
