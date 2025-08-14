@@ -52,40 +52,40 @@ public class CommunityController {
 
     @GetMapping("/detail")
     @Operation(summary = "커뮤니티글 한 개 조회", description = "커뮤니티글 한 개를 조회합니다.")
-    public ApiResTemplate<CommunityDetailResponseDto> getCommunity(@RequestParam Long communityId, Principal principal) {
+    public ApiResTemplate<CommunityDetailResponseDto> getCommunity(
+            @RequestParam Long communityId,
+            Principal principal
+    ) {
         Community community = communityService.getCommunityWithRedisViewCount(communityId, principal);
-        CommunityDetailResponseDto communityDetailResponseDto = CommunityDetailResponseDto.from(community);
+
+        // 댓글 개수 계산
+        int commentCount = communityService.getCommentCountByCommunityId(communityId);
+
+        CommunityDetailResponseDto communityDetailResponseDto =
+                CommunityDetailResponseDto.from(community, commentCount);
+
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityDetailResponseDto);
     }
+
 
     @GetMapping
     @Operation(method = "GET", summary = "커뮤니티글 전체 조회", description = "전체 커뮤니티글을 조회합니다.")
     public ApiResTemplate<List<CommunityAllResponseDto>> getAllCommunities() {
-        List<Community> communities = communityService.getAllCommunities();
-        List<CommunityAllResponseDto> communityAllResponseDtos = communities.stream()
-                .map(CommunityAllResponseDto::from)
-                .toList();
-        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityAllResponseDtos);
+        List<CommunityAllResponseDto> communities = communityService.getAllCommunities();
+        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communities);
     }
 
     @GetMapping("/my")
     @Operation(method = "GET", summary = "본인이 작성한 커뮤니티글 조회", description = "본인이 작성한 커뮤니티글만 조회합니다.")
     public ApiResTemplate<List<CommunityAllResponseDto>> getMyCommunities(Principal principal) {
-        List<Community> communities = communityService.getMyCommunities(principal);
-        List<CommunityAllResponseDto> communityAllResponseDtos = communities.stream()
-                .map(CommunityAllResponseDto::from)
-                .toList();
-        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityAllResponseDtos);
+        List<CommunityAllResponseDto> communities = communityService.getMyCommunities(principal);
+        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communities);
     }
 
     @GetMapping("/search")
     @Operation(method = "GET", summary = "커뮤니티글 제목 검색", description = "커뮤니티글 제목으로 검색합니다.")
     public ApiResTemplate<List<CommunityAllResponseDto>> searchCommunitiesByTitle(@RequestParam String keyword) {
-        List<Community> communities = communityService.searchCommunitiesByTitle(keyword);
-        List<CommunityAllResponseDto> communityAllResponseDtos = communities.stream()
-                .map(CommunityAllResponseDto::from)
-                .toList();
-
-        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityAllResponseDtos);
+        List<CommunityAllResponseDto> communities = communityService.searchCommunitiesByTitle(keyword);
+        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communities);
     }
 }

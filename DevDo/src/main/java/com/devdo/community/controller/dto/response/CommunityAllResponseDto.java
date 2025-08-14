@@ -9,17 +9,18 @@ public record CommunityAllResponseDto(
         Long id,
         String title,
         LocalDateTime createdAt,
-        Long viewCount
-
+        Long viewCount,
+        int commentCount // 댓글 개수
 ) {
-    public static CommunityAllResponseDto from(Community community) {
+    public static CommunityAllResponseDto from(Community community, int commentCount) {
         Member member = community.getMember();
 
         return new CommunityAllResponseDto(
                 community.getId(),
                 community.getTitle(),
                 community.getCreatedAt(),
-                community.getViewCount()
+                community.getViewCount(),
+                commentCount
         );
     }
 }

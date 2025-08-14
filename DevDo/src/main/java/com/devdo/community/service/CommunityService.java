@@ -1,8 +1,10 @@
 package com.devdo.community.service;
 
+import com.devdo.comment.domain.repository.CommentRepository;
 import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.community.controller.dto.request.CommunityRequestDto;
+import com.devdo.community.controller.dto.response.CommunityAllResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
 import com.devdo.member.domain.Member;
@@ -25,6 +27,7 @@ public class CommunityService {
     private final MemberRepository memberRepository;
     private final ScrapRepository scrapRepository;
     private final StringRedisTemplate stringRedisTemplate;
+    private final CommentRepository commentRepository;
 
     // 공통 메서드
     @Transactional
@@ -105,19 +108,46 @@ public class CommunityService {
     }
 
     @Transactional(readOnly = true)
-    public List<Community> getAllCommunities() {
-        return communityRepository.findAll();
+    public List<CommunityAllResponseDto> getAllCommunities() {
+        List<Community> communities = communityRepository.findAll();
+
+        return communities.stream()
+                .map(community -> {
+                    int commentCount = commentRepository.countByCommunity_Id(community.getId());
+                    return CommunityAllResponseDto.from(community, commentCount);
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Community> getMyCommunities(Principal principal) {
+    public List<CommunityAllResponseDto> getMyCommunities(Principal principal) {
         Member member = getMemberFromPrincipal(principal);
-        return communityRepository.findAllByMember_MemberId(member.getMemberId());
+        List<Community> communities = communityRepository.findAllByMember_MemberId(member.getMemberId());
+
+        return communities.stream()
+                .map(community -> {
+                    int commentCount = commentRepository.countByCommunity_Id(community.getId());
+                    return CommunityAllResponseDto.from(community, commentCount);
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Community> searchCommunitiesByTitle(String keyword) {
-        return communityRepository.findByTitleContainingIgnoreCase(keyword);
+    public List<CommunityAllResponseDto> searchCommunitiesByTitle(String keyword) {
+        List<Community> communities = communityRepository.findByTitleContainingIgnoreCase(keyword);
+
+        return communities.stream()
+                .map(community -> {
+                    int commentCount = commentRepository.countByCommunity_Id(community.getId());
+                    return CommunityAllResponseDto.from(community, commentCount);
+                })
+                .toList();
+    }
+
+    // 댓글 개수
+    @Transactional(readOnly = true)
+    public int getCommentCountByCommunityId(Long communityId) {
+        return commentRepository.countByCommunity_Id(communityId);
     }
 
     // Redis 조회수
