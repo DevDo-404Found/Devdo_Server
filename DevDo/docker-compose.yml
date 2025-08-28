@@ -2,21 +2,24 @@ version: "3.8"
 
 services:
   backend:
-    image: ttttkii91333/devdo1
-    container_name: devdo1-server
+    image: ${DOCKER_USERNAME}/${DOCKER_BACK_IMAGE}
+    container_name: ${DOCKER_BACK_CONTAINER}
     ports:
       - "8080:8080"
     depends_on:
       - redis
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_LOCATION: /config/application-prod.yml
       REDIS_HOST: redis
       REDIS_PORT: 6379
+    volumes:
+      - /home/${EC2_USER}/app/config/application-prod.yml:/config/application-prod.yml
     restart: always
 
   redis:
     image: redis:7.2
-    container_name: devdo1-redis
+    container_name: ${DOCKER_REDIS_CONTAINER}
     ports:
       - "6379:6379"
     volumes:
