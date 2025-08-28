@@ -25,13 +25,6 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Copy Secret
-        env:
-          OCCUPY_SECRET: ${{ secrets.OCCUPY_SECRET }}
-          OCCUPY_SECRET_DIR: DevDo/src/main/resources
-          OCCUPY_SECRET_DIR_FILE_NAME: application-prod.yml
-        run: echo $OCCUPY_SECRET | base64 --decode > $OCCUPY_SECRET_DIR/$OCCUPY_SECRET_DIR_FILE_NAME
-
       - name: Gradle 권한 설정
         run: |
           cd DevDo
@@ -54,18 +47,18 @@ jobs:
 
       # Docker 이미지 Build (2)
       - name: docker image build
-        run: cd DevDo && docker build -t ttttkii91333/devdo1 .
+        run: cd DevDo && docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_BACK_IMAGE }} .
 
       # DockerHub Login (3)
       - name: docker login
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Docker Hub push (4)
       - name: docker Hub push
-        run: docker push ttttkii91333/devdo1
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_BACK_IMAGE }}
 
       # GET GitHub IP (5)
       - name: get GitHub IP
@@ -89,27 +82,26 @@ jobs:
         uses: appleboy/scp-action@v0.1.5
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           source: "DevDo/docker-compose.yml"
-          target: "/home/ec2-user/app"
+          target: "/home/${{ secrets.EC2_USER }}/app/Devdo"
+          overwrite: true
 
       - name: SSH 접속하여 docker-compose 실행
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           timeout: 60s
           script: |
-            cd /home/ec2-user/app/DevDo
-            sudo docker stop devdo1-server || true
-            sudo docker rm devdo1-server || true            
+            cd /home/${{ secrets.EC2_USER }}/app/DevDo
             sudo docker-compose down
             sleep 2
-            sudo docker pull ttttkii91333/devdo1
+            sudo docker-compose pull
             sudo docker-compose up -d
 
       - name: Remove GitHub IP from SG
