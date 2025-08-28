@@ -26,8 +26,10 @@ logging:
 jwt:
   secret: ${JWT_SECRET}
   access-token-validity-in-milliseconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_MILLISECONDS}
-  cookieSecure: ${COOKIE_SECURE}
-  cookieSameSite: ${COOKIE_SAMESITE}
+
+cookie:
+  secure: ${COOKIE_SECURE}
+  sameSite: ${COOKIE_SAMESITE}
 
 google:
   client-id: ${GOOGLE_CLIENT_ID}

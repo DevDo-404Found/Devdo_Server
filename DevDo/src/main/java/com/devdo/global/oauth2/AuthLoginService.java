@@ -23,10 +23,10 @@ public class AuthLoginService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
 
-    @Value("${jwt.cookieSecure}")
+    @Value("${cookie.secure}")
     private boolean cookieSecure;
 
-    @Value("${jwt.cookieSameSite}")
+    @Value("${cookie.sameSite}")
     private String cookieSameSite;
 
     // refreshToken 저장
