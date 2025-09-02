@@ -1,6 +1,7 @@
 package com.devdo.roadmap.controller;
 
 import com.devdo.roadmap.controller.dto.request.RoadmapRequestDto;
+import com.devdo.roadmap.controller.dto.response.RoadmapMainResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapResponseDto;
 import com.devdo.roadmap.service.RoadmapService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,12 @@ public class RoadmapController {
     @Operation(method = "GET", summary = "로드맵 조회", description = "로드맵을 조회합니다.")
     public List<RoadmapResponseDto> getMyRoadmaps(@RequestParam Long memberId) {
         return roadmapService.getMyRoadmaps(memberId);
+    }
+
+    @GetMapping("/main")
+    @Operation(method = "GET", summary = "메인 로드맵 목록 조회", description = "사용자의 메인 로드맵 목록을 조회합니다.")
+    public List<RoadmapMainResponseDto> getMainRoadmaps(@RequestParam Long memberId) {
+        return roadmapService.getMainRoadmaps(memberId);
     }
 
     @PutMapping("/title/{roadmapId}")
