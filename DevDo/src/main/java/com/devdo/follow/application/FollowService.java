@@ -82,7 +82,11 @@ public class FollowService {
                 .map(MemberInfoResDto::from)
                 .collect(Collectors.toList());
 
-        return FollowResDto.from(member.getFollowerCount(), member.getFollowingCount(), memberInfoResDtos);
+        // 팔로워, 팔로잉 수 카운트 (쿼리에서 탈퇴 회원 필터링)
+        int followerCount = followRepository.countFollowers(member);
+        int followingCount = followRepository.countFollowings(member);
+
+        return FollowResDto.from(followerCount, followingCount, memberInfoResDtos);
     }
 
     // 팔로워 조회
@@ -95,7 +99,11 @@ public class FollowService {
                 .map(MemberInfoResDto::from)
                 .collect(Collectors.toList());
 
-        return FollowResDto.from(member.getFollowerCount(), member.getFollowingCount(), memberInfoResDtos);
+        // 팔로워, 팔로잉 수 카운트 (쿼리에서 탈퇴 회원 필터링)
+        int followerCount = followRepository.countFollowers(member);
+        int followingCount = followRepository.countFollowings(member);
+
+        return FollowResDto.from(followerCount, followingCount, memberInfoResDtos);
     }
 
     // entity 찾는 공통 메소드 - 로그인한 사용자 찾기
@@ -111,7 +119,7 @@ public class FollowService {
     private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(
                 () -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND_EXCEPTION
-                , ErrorCode.MEMBER_NOT_FOUND_EXCEPTION.getMessage() + memberId));
+                        , ErrorCode.MEMBER_NOT_FOUND_EXCEPTION.getMessage() + memberId));
     }
 
     // entity 찾는 공통 메소드 - follow 찾기
