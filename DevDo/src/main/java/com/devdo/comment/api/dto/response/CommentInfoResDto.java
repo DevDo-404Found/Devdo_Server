@@ -14,7 +14,7 @@ public record CommentInfoResDto(
         Long commentId,
         Long communityId,
         String content,
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        @JsonFormat(pattern = "yy/MM/dd HH:mm")
         LocalDateTime commentCreatedAt,
         String writerNickname,
         String writerPictureUrl,
