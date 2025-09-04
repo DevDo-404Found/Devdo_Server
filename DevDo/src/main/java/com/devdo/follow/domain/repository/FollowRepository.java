@@ -14,8 +14,16 @@ import java.util.Optional;
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     boolean existsByFromMemberAndToMember(Member fromMember, Member toMember);
     Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember);
-    @Query("SELECT f.toMember FROM Follow f WHERE f.fromMember = :member")
+
+    // 팔로우, 팔로잉 리스트 (탈퇴 회원 보이지 않게 필터링)
+    @Query("SELECT f.toMember FROM Follow f WHERE f.fromMember = :member AND f.toMember.isDeleted = false")
     List<Member> findFollowings(@Param("member") Member member);
-    @Query("SELECT f.fromMember FROM Follow f WHERE f.toMember = :member")
+    @Query("SELECT f.fromMember FROM Follow f WHERE f.toMember = :member AND f.fromMember.isDeleted = false")
     List<Member> findFollowers(@Param("member") Member member);
+
+    // 팔로우 수, 팔로잉 수 카운트 (탈퇴 회원 수 포함하지 않게 필터링)
+    @Query("SELECT COUNT(f) FROM Follow f WHERE f.fromMember = :member AND f.toMember.isDeleted = false")
+    int countFollowings(@Param("member") Member member);
+    @Query("SELECT COUNT(f) FROM Follow f WHERE f.toMember = :member AND f.fromMember.isDeleted = false")
+    int countFollowers(@Param("member") Member member);
 }

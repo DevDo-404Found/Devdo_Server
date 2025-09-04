@@ -56,6 +56,16 @@ public class MemberService {
         return MemberInfoResDto.from(member);
     }
 
+    // 회원 탈퇴 - soft delete 방식
+    @Transactional
+    public void deleteMember(Principal principal) {
+        Long id = Long.parseLong(principal.getName());
+        Member member = getMemberById(id);
+
+        // soft delete
+        member.deleteMember();
+    }
+
     // entity 찾는 공통 메소드
     private Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(
