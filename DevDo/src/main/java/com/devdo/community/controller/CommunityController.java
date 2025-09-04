@@ -57,14 +57,7 @@ public class CommunityController {
             @RequestParam Long communityId,
             Principal principal
     ) {
-        Community community = communityService.getCommunityWithRedisViewCount(communityId, principal);
-
-        // 댓글 개수 계산
-        int commentCount = communityService.getCommentCountByCommunityId(communityId);
-
-        CommunityDetailResponseDto communityDetailResponseDto =
-                CommunityDetailResponseDto.from(community, commentCount);
-
+        CommunityDetailResponseDto communityDetailResponseDto = communityService.getCommunityDetail(communityId, principal);
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityDetailResponseDto);
     }
 

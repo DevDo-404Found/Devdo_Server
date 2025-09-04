@@ -2,6 +2,7 @@ package com.devdo.like.api;
 
 import com.devdo.common.error.SuccessCode;
 import com.devdo.common.template.ApiResTemplate;
+import com.devdo.like.api.dto.LikeResDto;
 import com.devdo.like.application.LikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,9 +25,9 @@ public class LikeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
     @PostMapping
-    public ApiResTemplate<Long> saveLike(@RequestParam Long communityId, Principal principal) {
-        likeService.saveLike(communityId, principal);
-        return ApiResTemplate.successResponse(SuccessCode.LIKE_SAVE_SUCCESS, communityId);
+    public ApiResTemplate<LikeResDto> saveLike(@RequestParam Long communityId, Principal principal) {
+        LikeResDto likeResDto = likeService.saveLike(communityId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.LIKE_SAVE_SUCCESS, likeResDto);
     }
 
     @Operation(summary = "좋아요 삭제", description = "로그인한 사용자가 커뮤니티 게시글에 생성한 좋아요를 삭제합니다.")
@@ -35,8 +36,8 @@ public class LikeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
     @DeleteMapping
-    public ApiResTemplate<Long> deleteLike(@RequestParam Long communityId, Principal principal) {
-        likeService.deleteLike(communityId, principal);
-        return ApiResTemplate.successResponse(SuccessCode.LIKE_DELETE_SUCCESS, communityId);
+    public ApiResTemplate<LikeResDto> deleteLike(@RequestParam Long communityId, Principal principal) {
+        LikeResDto likeResDto = likeService.deleteLike(communityId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.LIKE_DELETE_SUCCESS, likeResDto);
     }
 }

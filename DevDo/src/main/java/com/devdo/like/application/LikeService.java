@@ -4,6 +4,7 @@ import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
+import com.devdo.like.api.dto.LikeResDto;
 import com.devdo.like.domain.Like;
 import com.devdo.like.domain.repository.LikeRepository;
 import com.devdo.member.domain.Member;
@@ -24,7 +25,7 @@ public class LikeService {
     private final CommunityRepository communityRepository;
 
     // 좋아요 생성
-    public void saveLike(Long communityId, Principal principal) {
+    public LikeResDto saveLike(Long communityId, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
         Community community = getCommunity(communityId);
 
@@ -40,10 +41,12 @@ public class LikeService {
 
         // 좋아요 개수 증가
         community.updateLikeCount(1);
+
+        return new LikeResDto(true);
     }
 
     // 좋아요 취소
-    public void deleteLike(Long communityId, Principal principal) {
+    public LikeResDto deleteLike(Long communityId, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
         Community community = getCommunity(communityId);
 
@@ -57,6 +60,8 @@ public class LikeService {
 
         // 좋아요 개수 감소
         community.updateLikeCount(-1);
+
+        return new LikeResDto(false);
     }
 
     // entity 찾는 공통 메소드 - member
