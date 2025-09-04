@@ -5,6 +5,7 @@ import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.community.controller.dto.request.CommunityRequestDto;
 import com.devdo.community.controller.dto.response.CommunityAllResponseDto;
+import com.devdo.community.controller.dto.response.CommunityProfileResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
 import com.devdo.member.domain.Member;
@@ -131,6 +132,22 @@ public class CommunityService {
                 })
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public CommunityProfileResponseDto getCommunityProfile(Long communityId) {
+        Community community = findCommunityById(communityId);
+        Member member = community.getMember();
+        int commentCount = commentRepository.countByCommunity_Id(communityId);
+
+        return CommunityProfileResponseDto.from(
+                member,
+                community.getTitle(),
+                community.getCreatedAt(),
+                community.getViewCount(),
+                commentCount
+        );
+    }
+
 
     @Transactional(readOnly = true)
     public List<CommunityAllResponseDto> searchCommunitiesByTitle(String keyword) {

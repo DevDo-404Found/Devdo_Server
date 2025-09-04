@@ -2,6 +2,7 @@ package com.devdo.community.controller.dto.response;
 
 import com.devdo.community.entity.Community;
 import com.devdo.member.domain.Member;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
@@ -10,10 +11,11 @@ public record CommunityDetailResponseDto(
         String pictureUrl,
         String title,
         String content,
+        @JsonFormat(pattern = "yy/MM/dd HH:mm")
         LocalDateTime createdAt,
         Long viewCount,
         Long viewLike,
-
+        String memberNickname,
         int commentCount // 댓글 개수
 ) {
     public static CommunityDetailResponseDto from(Community community, int commentCount) {
@@ -27,6 +29,7 @@ public record CommunityDetailResponseDto(
                 community.getCreatedAt(),
                 community.getViewCount(),
                 community.getLikeCount(),
+                member.getNickname(),
                 commentCount
         );
     }
