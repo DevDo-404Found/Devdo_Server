@@ -47,6 +47,9 @@ public class Member {
 
     private String refreshToken;
 
+    @Column(name = "member_info_delete")
+    private boolean isDeleted = false;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
@@ -83,5 +86,14 @@ public class Member {
 
     public void saveRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    // member info soft delete
+    public void deleteMember() {
+        this.nickname = "탈퇴한 회원";
+        this.email = null;
+        this.refreshToken = null;
+        this.isDeleted = true;
+        this.pictureUrl = null;
     }
 }
