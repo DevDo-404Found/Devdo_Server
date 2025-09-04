@@ -5,9 +5,11 @@ import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.community.controller.dto.request.CommunityRequestDto;
 import com.devdo.community.controller.dto.response.CommunityAllResponseDto;
+import com.devdo.community.controller.dto.response.CommunityDetailResponseDto;
 import com.devdo.community.controller.dto.response.CommunityProfileResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
+import com.devdo.like.domain.repository.LikeRepository;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import com.devdo.scrap.repository.ScrapRepository;
@@ -29,6 +31,7 @@ public class CommunityService {
     private final ScrapRepository scrapRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
     // 공통 메서드
     @Transactional
@@ -184,5 +187,21 @@ public class CommunityService {
             stringRedisTemplate.opsForValue().set(redisKey, "1", Duration.ofHours(24));
         }
         return community;
+    }
+
+    // 커뮤니티 게시글 상세 조회 (좋아요 상태, redis 반영)
+    @Transactional
+    public CommunityDetailResponseDto getCommunityDetail(Long communityId, Principal principal) {
+        Member member = getMemberFromPrincipal(principal);
+        Community community = getCommunityWithRedisViewCount(communityId, principal);
+
+        int commentCount = commentRepository.countByCommunity_Id(communityId);
+
+        boolean isLiked = false;
+        if (member != null) {
+            isLiked = likeRepository.existsByMemberAndCommunity(member, community);
+        }
+
+        return CommunityDetailResponseDto.from(community, commentCount, isLiked);
     }
 }
