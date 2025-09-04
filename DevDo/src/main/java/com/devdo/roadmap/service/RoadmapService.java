@@ -61,14 +61,14 @@ public class RoadmapService {
     }
 
     @Transactional
-    public void updateRoadmap(Long roadmapId, String newTitle) {
+    public void updateRoadmap(Long roadmapId, String newTitle, Long memberId) {
         Roadmap roadmap = roadmapRepository.findById(roadmapId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 로드맵이 존재하지 않습니다."));
         roadmap.updateTitle(newTitle);
     }
 
     @Transactional
-    public void deleteRoadmap(Long roadmapId) {
+    public void deleteRoadmap(Long roadmapId, Long memberId) {
         roadmapRepository.deleteById(roadmapId);
     }
 }
