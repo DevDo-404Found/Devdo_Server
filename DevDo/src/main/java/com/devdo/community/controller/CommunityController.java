@@ -5,6 +5,7 @@ import com.devdo.common.template.ApiResTemplate;
 import com.devdo.community.controller.dto.request.CommunityRequestDto;
 import com.devdo.community.controller.dto.response.CommunityAllResponseDto;
 import com.devdo.community.controller.dto.response.CommunityDetailResponseDto;
+import com.devdo.community.controller.dto.response.CommunityProfileResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.service.CommunityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,6 +81,13 @@ public class CommunityController {
     public ApiResTemplate<List<CommunityAllResponseDto>> getMyCommunities(Principal principal) {
         List<CommunityAllResponseDto> communities = communityService.getMyCommunities(principal);
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communities);
+    }
+
+    @GetMapping("/profile")
+    @Operation(summary = "커뮤니티 작성자 프로필 조회", description = "커뮤니티 작성자의 프로필과 글 정보를 조회합니다.")
+    public ApiResTemplate<CommunityProfileResponseDto> getCommunityProfile(@RequestParam Long communityId) {
+        CommunityProfileResponseDto communityProfile = communityService.getCommunityProfile(communityId);
+        return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityProfile);
     }
 
     @GetMapping("/search")
