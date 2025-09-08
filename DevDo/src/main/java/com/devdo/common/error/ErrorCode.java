@@ -18,6 +18,7 @@ public enum ErrorCode {
     ALREADY_EXISTS_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다.", "BAD_REQUEST_400"),
     ALREADY_EXISTS_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다.", "BAD_REQUEST_400"),
     ALREADY_EXISTS_LIKE(HttpStatus.BAD_REQUEST, "이미 좋아요을 누른 게시글입니다.", "BAD_REQUEST_400"),
+    ALREADY_EXISTS_SCRAP(HttpStatus.BAD_REQUEST,"이미 스크랩한 게시글입니다.","BAD_REQUEST_400"),
 
     // 401 UNAUTHORIZED
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "JWT가 비어있거나 잘못된 값입니다.", "UNAUTHORIZED_401"),

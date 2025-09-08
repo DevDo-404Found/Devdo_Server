@@ -23,18 +23,18 @@ public class ScrapController {
 
     @PostMapping
     @Operation(method = "POST", summary = "스크랩 추가", description = "스크랩을 추가합니다.")
-    public ApiResTemplate<String> addScrap(@RequestParam Long communityId,
-                                              Principal principal) {
-        scrapService.saveScrap(communityId, principal);
-        return ApiResTemplate.successResponse(SuccessCode.SCRAP_SAVE_SUCCESS, "communityId : " + communityId + ", 스크랩 추가 완료");
+    public ApiResTemplate<Boolean> addScrap(@RequestParam Long communityId,
+                                            Principal principal) {
+        boolean status = scrapService.saveScrap(communityId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.SCRAP_SAVE_SUCCESS, status);
     }
 
     @DeleteMapping
     @Operation(method = "DELETE", summary = "스크랩 삭제", description = "스크랩을 삭제합니다.")
-    public ApiResTemplate<String> deleteScrap(@RequestParam Long communityId,
-                                                 Principal principal) {
-        scrapService.deletesScrap(communityId, principal);
-        return ApiResTemplate.successResponse(SuccessCode.SCRAP_DELETE_SUCCESS, "communityId : " + communityId + ", 스크랩 삭제 완료");
+    public ApiResTemplate<Boolean> deleteScrap(@RequestParam Long communityId,
+                                               Principal principal) {
+        boolean status = scrapService.deleteScrap(communityId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.SCRAP_DELETE_SUCCESS, status);
     }
 
     @GetMapping

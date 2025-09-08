@@ -142,14 +142,26 @@ public class CommunityService {
         Member member = community.getMember();
         int commentCount = commentRepository.countByCommunity_Id(communityId);
 
+        // 작성자가 쓴 글 모두 조회
+        List<CommunityAllResponseDto> myCommunities = communityRepository
+                .findAllByMember_MemberId(member.getMemberId())
+                .stream()
+                .map(c -> {
+                    int cmtCount = commentRepository.countByCommunity_Id(c.getId());
+                    return CommunityAllResponseDto.from(c, cmtCount);
+                })
+                .toList();
+
         return CommunityProfileResponseDto.from(
                 member,
                 community.getTitle(),
                 community.getCreatedAt(),
                 community.getViewCount(),
-                commentCount
+                commentCount,
+                myCommunities
         );
     }
+
 
 
     @Transactional(readOnly = true)
