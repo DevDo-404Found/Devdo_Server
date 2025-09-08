@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 public record CommunityDetailResponseDto(
         Long id,
+        Long memberId,
         String nickname,
         String pictureUrl,
         String title,
@@ -25,6 +26,7 @@ public record CommunityDetailResponseDto(
 
         return new CommunityDetailResponseDto(
                 community.getId(),
+                member.getMemberId(),
                 MemberInfoHelper.getMemberNickname(member),
                 MemberInfoHelper.getMemberPictureUrl(member),
                 community.getTitle(),
