@@ -4,6 +4,7 @@ import com.devdo.member.domain.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record CommunityProfileResponseDto(
         String profilePicture,
@@ -14,10 +15,11 @@ public record CommunityProfileResponseDto(
         Long viewCount,
         int commentCount,
         int followerCount,
-        int followingCount
+        int followingCount,
+        List<CommunityAllResponseDto> myCommunities
 ) {
     public static CommunityProfileResponseDto from(Member member, String title, LocalDateTime createdAt,
-                                                   Long viewCount, int commentCount) {
+                                                   Long viewCount, int commentCount, List<CommunityAllResponseDto> myCommunities) {
         return new CommunityProfileResponseDto(
                 member.getPictureUrl(),
                 member.getNickname(),
@@ -26,7 +28,8 @@ public record CommunityProfileResponseDto(
                 viewCount,
                 commentCount,
                 member.getFollowerCount(),
-                member.getFollowingCount()
+                member.getFollowingCount(),
+                myCommunities
         );
     }
 }
