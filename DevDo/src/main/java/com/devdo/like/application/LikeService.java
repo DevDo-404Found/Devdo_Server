@@ -42,7 +42,7 @@ public class LikeService {
         // 좋아요 개수 증가
         community.updateLikeCount(1);
 
-        return new LikeResDto(true);
+        return new LikeResDto(true, community.getLikeCount());
     }
 
     // 좋아요 취소
@@ -61,7 +61,7 @@ public class LikeService {
         // 좋아요 개수 감소
         community.updateLikeCount(-1);
 
-        return new LikeResDto(false);
+        return new LikeResDto(false, community.getLikeCount());
     }
 
     // entity 찾는 공통 메소드 - member
