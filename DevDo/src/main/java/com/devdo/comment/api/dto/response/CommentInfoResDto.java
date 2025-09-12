@@ -18,6 +18,7 @@ public record CommentInfoResDto(
         LocalDateTime commentCreatedAt,
         String writerNickname,
         String writerPictureUrl,
+        Long commentCount,
         List<CommentInfoResDto> childComments
 ) {
     public static CommentInfoResDto from(Comment comment) {
@@ -35,6 +36,7 @@ public record CommentInfoResDto(
                 comment.getCommentCreatedAt(),
                 MemberInfoHelper.getMemberNickname(comment.getMember()),
                 MemberInfoHelper.getMemberPictureUrl(comment.getMember()),
+                comment.getCommunity().getCommentCount(),
                 childComments
         );
     }
