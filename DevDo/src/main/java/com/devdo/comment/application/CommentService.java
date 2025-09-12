@@ -71,6 +71,10 @@ public class CommentService {
                 .build();
 
         Comment savedComment = commentRepository.save(comment);
+
+        // comment count update
+        community.updateCommentCount(1);
+
         return CommentInfoResDto.from(savedComment);
     }
 
@@ -102,6 +106,9 @@ public class CommentService {
                     , ErrorCode.FORBIDDEN_EXCEPTION.getMessage());
         }
 
+        // comment count update
+        comment.getCommunity().updateCommentCount(-1);
+
         commentRepository.delete(comment);
     }
 
@@ -125,6 +132,6 @@ public class CommentService {
     private Comment getComment(Long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.COMMENT_NOT_FOUND_EXCEPTION,
-                    ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage() + id));
+                        ErrorCode.COMMENT_NOT_FOUND_EXCEPTION.getMessage() + id));
     }
 }
