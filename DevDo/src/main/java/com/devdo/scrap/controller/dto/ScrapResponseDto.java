@@ -9,7 +9,8 @@ public record ScrapResponseDto(
         Long id,
         String title,
         String content,
-        LocalDateTime communityCreatedAt // 커뮤니티글 작성일
+        LocalDateTime communityCreatedAt, // 커뮤니티글 작성일
+        boolean isScrapped
 
 ) {
     public static ScrapResponseDto from(Scrap scrap) {
@@ -19,7 +20,18 @@ public record ScrapResponseDto(
                 community.getId(),
                 community.getTitle(),
                 community.getContent(),
-                community.getCreatedAt() // 커뮤니티글 작성일
+                community.getCreatedAt(), // 커뮤니티글 작성일
+                true
+        );
+    }
+
+    public static ScrapResponseDto of(Community community, boolean isScrapped) {
+        return new ScrapResponseDto(
+                community.getId(),
+                community.getTitle(),
+                community.getContent(),
+                community.getCreatedAt(),
+                isScrapped
         );
     }
 }
