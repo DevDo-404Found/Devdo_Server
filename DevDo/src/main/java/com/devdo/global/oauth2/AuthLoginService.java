@@ -5,6 +5,7 @@ import com.devdo.common.error.SuccessCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.common.template.ApiResTemplate;
 import com.devdo.global.jwt.JwtTokenProvider;
+import com.devdo.global.jwt.LoginResDto;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class AuthLoginService {
     private String cookieSameSite;
 
     // refreshToken 저장
-    public ResponseEntity<ApiResTemplate<String>> loginSuccess(Member member) {
+    public ResponseEntity<ApiResTemplate<LoginResDto>> loginSuccess(Member member) {
         String accessToken = jwtTokenProvider.generateToken(member);
         String refreshToken = jwtTokenProvider.generateRefreshToken(member);
 
@@ -50,9 +51,11 @@ public class AuthLoginService {
         System.out.println("cookieSecure = " + cookieSecure);
         System.out.println("cookieSameSite = " + cookieSameSite);
 
+        LoginResDto loginResDto = new LoginResDto(accessToken, member.getMemberId());
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(ApiResTemplate.successResponse(SuccessCode.LOGIN_SUCCESS, accessToken));
+                .body(ApiResTemplate.successResponse(SuccessCode.LOGIN_SUCCESS, loginResDto));
     }
 
     // refreshToken으로 새로운 accessToken 생성

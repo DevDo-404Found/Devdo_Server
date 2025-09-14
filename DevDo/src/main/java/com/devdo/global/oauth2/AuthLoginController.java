@@ -3,6 +3,7 @@ package com.devdo.global.oauth2;
 import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.common.template.ApiResTemplate;
+import com.devdo.global.jwt.LoginResDto;
 import com.devdo.global.oauth2.google.application.GoogleLoginService;
 import com.devdo.global.oauth2.kakao.application.KakaoLoginService;
 import com.devdo.member.domain.Member;
@@ -28,7 +29,7 @@ public class AuthLoginController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
     @GetMapping("/google")
-    public ResponseEntity<ApiResTemplate<String>> googleCallback(@RequestParam String code) {
+    public ResponseEntity<ApiResTemplate<LoginResDto>> googleCallback(@RequestParam String code) {
         Member member = googleLoginService.processLogin(code);
         return authLoginService.loginSuccess(member);
     }
@@ -39,7 +40,7 @@ public class AuthLoginController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
     @GetMapping("/kakao")
-    public ResponseEntity<ApiResTemplate<String>> kakaoCallback(@RequestParam String code) {
+    public ResponseEntity<ApiResTemplate<LoginResDto>> kakaoCallback(@RequestParam String code) {
         Member member = kakaoLoginService.processLogin(code);
         return authLoginService.loginSuccess(member);
     }
