@@ -5,6 +5,7 @@ import com.devdo.common.exception.BusinessException;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import com.devdo.roadmap.controller.dto.request.RoadmapRequestDto;
+import com.devdo.roadmap.controller.dto.response.RoadmapDetailResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapMainResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapResponseDto;
 import com.devdo.roadmap.entity.Roadmap;
@@ -58,6 +59,18 @@ public class RoadmapService {
                         .createdAt(r.getCreatedAt())
                         .build()
                 ).collect(toList());
+    }
+
+    @Transactional(readOnly = true)
+    public RoadmapDetailResponseDto getRoadmapNodeDetail(Long roadmapId, Long memberId) {
+        Roadmap roadmap = roadmapRepository.findById(roadmapId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROADMAP_NOT_FOUND_EXCEPTION, ErrorCode.ROADMAP_NOT_FOUND_EXCEPTION.getMessage()));
+
+        if (!roadmap.getMember().getMemberId().equals(memberId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_EXCEPTION, ErrorCode.FORBIDDEN_EXCEPTION.getMessage());
+        }
+
+        return RoadmapDetailResponseDto.from(roadmap);
     }
 
     @Transactional

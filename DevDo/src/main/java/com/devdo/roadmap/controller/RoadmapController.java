@@ -1,6 +1,7 @@
 package com.devdo.roadmap.controller;
 
 import com.devdo.roadmap.controller.dto.request.RoadmapRequestDto;
+import com.devdo.roadmap.controller.dto.response.RoadmapDetailResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapMainResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapResponseDto;
 import com.devdo.roadmap.service.RoadmapService;
@@ -40,6 +41,16 @@ public class RoadmapController {
     public List<RoadmapMainResponseDto> getMainRoadmaps(Principal principal) {
         Long memberId = Long.parseLong(principal.getName());
         return roadmapService.getMainRoadmaps(memberId);
+    }
+
+    @GetMapping("/{roadmapId}")
+    @Operation(method = "GET", summary = "특정 로드맵 노드 전체 조회", description = "특정 로드맵에서 특정 노드 정보를 조회합니다.")
+    public RoadmapDetailResponseDto getRoadmapNodeDetail(
+            @PathVariable Long roadmapId,
+            Principal principal
+    ) {
+        Long memberId = Long.parseLong(principal.getName());
+        return roadmapService.getRoadmapNodeDetail(roadmapId, memberId);
     }
 
     @PutMapping("/title/{roadmapId}")
