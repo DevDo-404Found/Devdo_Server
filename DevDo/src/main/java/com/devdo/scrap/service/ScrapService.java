@@ -55,7 +55,7 @@ public class ScrapService {
     }
 
     @Transactional
-    public boolean saveScrap(Long id, Principal principal) {
+    public ScrapResponseDto saveScrap(Long id, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
         Community community = findCommunityById(id);
 
@@ -71,11 +71,11 @@ public class ScrapService {
         community.increaseScrapCount();
         scrapRepository.save(scrap);
 
-        return true; // 스크랩 상태 = true
+        return ScrapResponseDto.of(community, true); // 스크랩 상태 true
     }
 
     @Transactional
-    public boolean deleteScrap(Long communityId, Principal principal) {
+    public ScrapResponseDto deleteScrap(Long communityId, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
         Community community = findCommunityById(communityId);
 
@@ -86,7 +86,7 @@ public class ScrapService {
         community.decreaseScrapCount();
         scrapRepository.delete(scrap);
 
-        return false; // 스크랩 상태 = false
+        return ScrapResponseDto.of(community, false); // 스크랩 상태 false
     }
 
     @Transactional(readOnly = true)
