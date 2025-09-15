@@ -210,10 +210,13 @@ public class CommunityService {
         int commentCount = commentRepository.countByCommunity_Id(communityId);
 
         boolean isLiked = false;
+        boolean isScrapped = false;
+
         if (member != null) {
             isLiked = likeRepository.existsByMemberAndCommunity(member, community);
+            isScrapped = scrapRepository.existsByMemberAndCommunity(member, community);
         }
 
-        return CommunityDetailResponseDto.from(community, commentCount, isLiked);
+        return CommunityDetailResponseDto.from(community, commentCount, isLiked, isScrapped);
     }
 }
