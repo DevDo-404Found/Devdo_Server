@@ -141,13 +141,13 @@ public class CommunityService {
     @Transactional(readOnly = true)
     public CommunityProfileResponseDto getCommunityProfile(Long communityId, Principal principal) {
         Community community = findCommunityById(communityId);
-        Member member = getMemberFromPrincipal(principal);
+        Member loginMember = getMemberFromPrincipal(principal);
         Member toMember = community.getMember();
         int commentCount = commentRepository.countByCommunity_Id(communityId);
 
         // 작성자가 쓴 글 모두 조회
         List<CommunityAllResponseDto> myCommunities = communityRepository
-                .findAllByMember_MemberId(member.getMemberId())
+                .findAllByMember_MemberId(toMember.getMemberId())
                 .stream()
                 .map(c -> {
                     int cmtCount = commentRepository.countByCommunity_Id(c.getId());
@@ -156,10 +156,10 @@ public class CommunityService {
                 .toList();
 
         // 팔로우 여부 확인
-        boolean isFollowing = followRepository.existsByFromMemberAndToMember(member, toMember);
+        boolean isFollowing = followRepository.existsByFromMemberAndToMember(loginMember, toMember);
 
         return CommunityProfileResponseDto.from(
-                member,
+                toMember,
                 community.getTitle(),
                 community.getCreatedAt(),
                 community.getViewCount(),
