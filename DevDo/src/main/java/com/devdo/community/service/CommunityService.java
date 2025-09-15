@@ -158,6 +158,9 @@ public class CommunityService {
         // 팔로우 여부 확인
         boolean isFollowing = followRepository.existsByFromMemberAndToMember(loginMember, toMember);
 
+        // 자신 프로필 여부 확인
+        boolean isMyProfile = loginMember.getMemberId().equals(toMember.getMemberId());
+
         return CommunityProfileResponseDto.from(
                 toMember,
                 community.getTitle(),
@@ -165,6 +168,7 @@ public class CommunityService {
                 community.getViewCount(),
                 commentCount,
                 isFollowing,
+                isMyProfile ? true : null,
                 myCommunities
         );
     }
