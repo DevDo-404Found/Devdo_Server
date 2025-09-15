@@ -19,9 +19,10 @@ public record CommunityDetailResponseDto(
         Long viewCount,
         Long viewLike,
         int commentCount, // 댓글 개수
-        Boolean isLiked
+        Boolean isLiked,
+        Boolean isScrapped
 ) {
-    public static CommunityDetailResponseDto from(Community community, int commentCount, boolean isLiked) {
+    public static CommunityDetailResponseDto from(Community community, int commentCount, boolean isLiked, boolean isScrapped) {
         Member member = community.getMember();
 
         return new CommunityDetailResponseDto(
@@ -35,7 +36,8 @@ public record CommunityDetailResponseDto(
                 community.getViewCount(),
                 community.getLikeCount(),
                 commentCount,
-                isLiked
+                isLiked,
+                isScrapped
         );
     }
 }
