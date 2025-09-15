@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,11 +76,22 @@ public class FollowService {
     // 팔로잉 조회
     public FollowResDto getFollowing(Long memberId, Principal principal) {
         Member member = getMemberById(memberId);
-        getMemberFromPrincipal(principal);
+        Member loginMember = getMemberFromPrincipal(principal);
 
         List<Member> followingMembers = followRepository.findFollowings(member);
+
+        // N + 1 해결
+        Set<Long> myFollowingList = followRepository.findFollowings(loginMember).stream()
+                .map(Member::getMemberId)
+                .collect(Collectors.toSet());
+
         List<MemberInfoResDto> memberInfoResDtos = followingMembers.stream()
-                .map(MemberInfoResDto::from)
+                .map(following -> {
+                    boolean isFollowing = myFollowingList.contains(following.getMemberId());
+                    boolean isMyProfile = following.getMemberId().equals(loginMember.getMemberId());
+                    return MemberInfoResDto.from(following, isFollowing, isMyProfile ? true : null);
+                })
+                .sorted((a, b) -> Boolean.compare(b.isMyProfile() != null && b.isMyProfile(), a.isMyProfile() != null && a.isMyProfile()))
                 .collect(Collectors.toList());
 
         // 팔로워, 팔로잉 수 카운트 (쿼리에서 탈퇴 회원 필터링)
@@ -92,11 +104,22 @@ public class FollowService {
     // 팔로워 조회
     public FollowResDto getFollower(Long memberId, Principal principal) {
         Member member = getMemberById(memberId);
-        getMemberFromPrincipal(principal);
+        Member loginMember = getMemberFromPrincipal(principal);
 
         List<Member> followerMembers = followRepository.findFollowers(member);
+
+        // N + 1 해결
+        Set<Long> myFollowingList = followRepository.findFollowings(loginMember).stream()
+                .map(Member::getMemberId)
+                .collect(Collectors.toSet());
+
         List<MemberInfoResDto> memberInfoResDtos = followerMembers.stream()
-                .map(MemberInfoResDto::from)
+                .map(follower -> {
+                    boolean isFollowing = myFollowingList.contains(follower.getMemberId());
+                    boolean isMyProfile = follower.getMemberId().equals(loginMember.getMemberId());
+                    return MemberInfoResDto.from(follower, isFollowing, isMyProfile ? true : null);
+                })
+                .sorted((a, b) -> Boolean.compare(b.isMyProfile() != null && b.isMyProfile(), a.isMyProfile() != null && a.isMyProfile()))
                 .collect(Collectors.toList());
 
         // 팔로워, 팔로잉 수 카운트 (쿼리에서 탈퇴 회원 필터링)
