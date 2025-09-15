@@ -30,11 +30,12 @@ public class NodeController {
 
     @GetMapping("/{nodeId}")
     @Operation(method = "GET", summary = "노드 조회", description = "노드를 조회합니다.")
-    public ResponseEntity<NodeResponseDto> getNodeDetail(
+    public ResponseEntity<NodeDetailResponseDto> getNodeDetail(
             @PathVariable Long nodeId
     ) {
         return ResponseEntity.ok(nodeService.getNodeDetail(nodeId));
     }
+
 
     @PutMapping("/{nodeId}")
     @Operation(method = "PUT", summary = "노드 수정", description = "노드를 수정합니다. (부모노드가 없을 시 parentNodeId에 null을 입력해주세요!)")
