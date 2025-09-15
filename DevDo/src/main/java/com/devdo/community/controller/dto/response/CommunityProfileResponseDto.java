@@ -17,10 +17,12 @@ public record CommunityProfileResponseDto(
         int commentCount,
         int followerCount,
         int followingCount,
+        boolean isFollowing,
         List<CommunityAllResponseDto> myCommunities
 ) {
     public static CommunityProfileResponseDto from(Member member, String title, LocalDateTime createdAt,
-                                                   Long viewCount, int commentCount, List<CommunityAllResponseDto> myCommunities) {
+                                                   Long viewCount, int commentCount, boolean isFollowing,
+                                                   List<CommunityAllResponseDto> myCommunities) {
         return new CommunityProfileResponseDto(
                 member.getMemberId(),
                 member.getPictureUrl(),
@@ -31,6 +33,7 @@ public record CommunityProfileResponseDto(
                 commentCount,
                 member.getFollowerCount(),
                 member.getFollowingCount(),
+                isFollowing,
                 myCommunities
         );
     }

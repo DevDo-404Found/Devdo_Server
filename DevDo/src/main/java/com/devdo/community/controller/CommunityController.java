@@ -78,8 +78,8 @@ public class CommunityController {
 
     @GetMapping("/profile")
     @Operation(summary = "커뮤니티 작성자 프로필 조회", description = "커뮤니티 작성자의 프로필과 글 정보를 조회합니다.")
-    public ApiResTemplate<CommunityProfileResponseDto> getCommunityProfile(@RequestParam Long communityId) {
-        CommunityProfileResponseDto communityProfile = communityService.getCommunityProfile(communityId);
+    public ApiResTemplate<CommunityProfileResponseDto> getCommunityProfile(@RequestParam Long communityId, Principal principal) {
+        CommunityProfileResponseDto communityProfile = communityService.getCommunityProfile(communityId, principal);
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, communityProfile);
     }
 
