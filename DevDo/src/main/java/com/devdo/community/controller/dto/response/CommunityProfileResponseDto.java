@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record CommunityProfileResponseDto(
+        Long memberId,
         String profilePicture,
         String nickname,
         String title,
@@ -21,6 +22,7 @@ public record CommunityProfileResponseDto(
     public static CommunityProfileResponseDto from(Member member, String title, LocalDateTime createdAt,
                                                    Long viewCount, int commentCount, List<CommunityAllResponseDto> myCommunities) {
         return new CommunityProfileResponseDto(
+                member.getMemberId(),
                 member.getPictureUrl(),
                 member.getNickname(),
                 title,
