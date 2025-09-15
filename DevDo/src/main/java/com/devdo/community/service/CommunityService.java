@@ -9,6 +9,7 @@ import com.devdo.community.controller.dto.response.CommunityDetailResponseDto;
 import com.devdo.community.controller.dto.response.CommunityProfileResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
+import com.devdo.follow.domain.repository.FollowRepository;
 import com.devdo.like.domain.repository.LikeRepository;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
@@ -32,6 +33,7 @@ public class CommunityService {
     private final StringRedisTemplate stringRedisTemplate;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+    private final FollowRepository followRepository;
 
     // 공통 메서드
     @Transactional
@@ -137,9 +139,10 @@ public class CommunityService {
     }
 
     @Transactional(readOnly = true)
-    public CommunityProfileResponseDto getCommunityProfile(Long communityId) {
+    public CommunityProfileResponseDto getCommunityProfile(Long communityId, Principal principal) {
         Community community = findCommunityById(communityId);
-        Member member = community.getMember();
+        Member member = getMemberFromPrincipal(principal);
+        Member toMember = community.getMember();
         int commentCount = commentRepository.countByCommunity_Id(communityId);
 
         // 작성자가 쓴 글 모두 조회
@@ -152,12 +155,16 @@ public class CommunityService {
                 })
                 .toList();
 
+        // 팔로우 여부 확인
+        boolean isFollowing = followRepository.existsByFromMemberAndToMember(member, toMember);
+
         return CommunityProfileResponseDto.from(
                 member,
                 community.getTitle(),
                 community.getCreatedAt(),
                 community.getViewCount(),
                 commentCount,
+                isFollowing,
                 myCommunities
         );
     }
