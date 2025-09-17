@@ -9,6 +9,7 @@ import com.devdo.community.controller.dto.response.CommunityDetailResponseDto;
 import com.devdo.community.controller.dto.response.CommunityProfileResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
+import com.devdo.follow.domain.repository.FollowRepository;
 import com.devdo.like.domain.repository.LikeRepository;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
@@ -32,6 +33,7 @@ public class CommunityService {
     private final StringRedisTemplate stringRedisTemplate;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+    private final FollowRepository followRepository;
 
     // 공통 메서드
     @Transactional
@@ -137,14 +139,15 @@ public class CommunityService {
     }
 
     @Transactional(readOnly = true)
-    public CommunityProfileResponseDto getCommunityProfile(Long communityId) {
+    public CommunityProfileResponseDto getCommunityProfile(Long communityId, Principal principal) {
         Community community = findCommunityById(communityId);
-        Member member = community.getMember();
+        Member loginMember = getMemberFromPrincipal(principal);
+        Member toMember = community.getMember();
         int commentCount = commentRepository.countByCommunity_Id(communityId);
 
         // 작성자가 쓴 글 모두 조회
         List<CommunityAllResponseDto> myCommunities = communityRepository
-                .findAllByMember_MemberId(member.getMemberId())
+                .findAllByMember_MemberId(toMember.getMemberId())
                 .stream()
                 .map(c -> {
                     int cmtCount = commentRepository.countByCommunity_Id(c.getId());
@@ -152,12 +155,20 @@ public class CommunityService {
                 })
                 .toList();
 
+        // 팔로우 여부 확인
+        boolean isFollowing = followRepository.existsByFromMemberAndToMember(loginMember, toMember);
+
+        // 자신 프로필 여부 확인
+        boolean isMyProfile = loginMember.getMemberId().equals(toMember.getMemberId());
+
         return CommunityProfileResponseDto.from(
-                member,
+                toMember,
                 community.getTitle(),
                 community.getCreatedAt(),
                 community.getViewCount(),
                 commentCount,
+                isFollowing,
+                isMyProfile ? true : null,
                 myCommunities
         );
     }
@@ -210,10 +221,13 @@ public class CommunityService {
         int commentCount = commentRepository.countByCommunity_Id(communityId);
 
         boolean isLiked = false;
+        boolean isScrapped = false;
+
         if (member != null) {
             isLiked = likeRepository.existsByMemberAndCommunity(member, community);
+            isScrapped = scrapRepository.existsByMemberAndCommunity(member, community);
         }
 
-        return CommunityDetailResponseDto.from(community, commentCount, isLiked);
+        return CommunityDetailResponseDto.from(community, commentCount, isLiked, isScrapped);
     }
 }
