@@ -5,6 +5,7 @@ import com.devdo.node.entity.NodeColor;
 import com.devdo.node.entity.NodeShape;
 
 public record NodeDetailResponseDto(
+        Long nodeId,
         Long roadmapId,
         String nodeName,
         NodeShape nodeShape,
@@ -15,6 +16,7 @@ public record NodeDetailResponseDto(
 ) {
     public static NodeDetailResponseDto from(Node node) {
         return new NodeDetailResponseDto(
+                node.getNodeId(),
                 node.getRoadmap().getId(),
                 node.getNodeName(),
                 node.getNodeShape(),
