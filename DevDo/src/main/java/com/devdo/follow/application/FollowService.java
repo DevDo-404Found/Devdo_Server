@@ -29,7 +29,7 @@ public class FollowService {
 
     // 팔로우 요청
     @Transactional
-    public void follow(Long toMemberId, Principal principal) {
+    public FollowResDto follow(Long toMemberId, Principal principal) {
         Member fromMember = getMemberFromPrincipal(principal);
         Member toMember = getMemberById(toMemberId);
 
@@ -56,11 +56,17 @@ public class FollowService {
         // follow count update
         fromMember.updateFollowingCount(+1);
         toMember.updateFollowerCount(+1);
+
+        // 팔로워, 팔로잉 수 카운트 (쿼리에서 탈퇴 회원 필터링)
+        int followerCount = followRepository.countFollowers(toMember);
+        int followingCount = followRepository.countFollowings(toMember);
+
+        return FollowResDto.from(followerCount, followingCount, true);
     }
 
     // 언팔로우 요청
     @Transactional
-    public void unfollow(Long toMemberId, Principal principal) {
+    public FollowResDto unfollow(Long toMemberId, Principal principal) {
         Member fromMember = getMemberFromPrincipal(principal);
         Member toMember = getMemberById(toMemberId);
 
@@ -71,6 +77,12 @@ public class FollowService {
         // follow count update
         fromMember.updateFollowingCount(-1);
         toMember.updateFollowerCount(-1);
+
+        // 팔로워, 팔로잉 수 카운트 (쿼리에서 탈퇴 회원 필터링)
+        int followerCount = followRepository.countFollowers(toMember);
+        int followingCount = followRepository.countFollowings(toMember);
+
+        return FollowResDto.from(followerCount, followingCount, false);
     }
 
     // 팔로잉 조회
