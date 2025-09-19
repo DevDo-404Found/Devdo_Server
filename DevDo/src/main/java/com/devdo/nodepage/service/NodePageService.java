@@ -10,11 +10,14 @@ import com.devdo.nodepage.controller.dto.response.NodePageResponseDto;
 import com.devdo.nodepage.entity.NodePage;
 import com.devdo.nodepage.repository.NodePageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -89,5 +92,19 @@ public class NodePageService {
                 nodePage.getEmoji(),
                 nodePage.getPictureUrl()
         );
+    }
+
+    @Scheduled(cron = "0 0 3 * * *") // 매일 3시 0분에 실행
+    @Transactional
+    public void deleteUnusedImages() {
+        // 24시간 전에 생성되었으며 노드와 연결되지 않은 NodePage를 찾음
+        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+        List<NodePage> orphanedPages = nodePageRepository
+                .findByPictureUrlIsNotNullAndNodeIsNullAndCreatedAtBefore(twentyFourHoursAgo);
+
+        for (NodePage page : orphanedPages) {
+            s3Service.deleteFile(page.getPictureUrl()); // S3에서 이미지 파일 삭제
+            nodePageRepository.delete(page); // DB에서 NodePage 레코드 삭제
+        }
     }
 }

@@ -3,6 +3,9 @@ package com.devdo.nodepage.entity;
 import com.devdo.node.entity.Node;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -31,6 +34,10 @@ public class NodePage {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "node_id", nullable = false)
     private Node node;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     public void updateContent(String content) {
         this.content = content;
