@@ -5,6 +5,7 @@ import com.devdo.roadmap.controller.dto.response.RoadmapDetailResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapMainResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapResponseDto;
 import com.devdo.roadmap.service.RoadmapService;
+import com.devdo.roadmaptemplate.controller.dto.request.RoadmapTemplateRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/roadmap")
@@ -27,6 +29,19 @@ public class RoadmapController {
                               Principal principal) {
         Long memberId = Long.parseLong(principal.getName());
         return roadmapService.createRoadmap(roadmapRequestDto, memberId);
+    }
+
+    @PostMapping("/template")
+    @Operation(method = "POST", summary = "템플릿으로 로드맵 생성", description = "미리 정의된 [Frontend, Backend, 협업] 템플릿을 사용하여 로드맵을 생성합니다.")
+    public Long createRoadmapFromTemplate(
+            @RequestBody RoadmapTemplateRequestDto requestDto,
+            Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        return roadmapService.createRoadmapFromTemplate(
+                requestDto.title(),
+                requestDto.templateType(),
+                memberId
+        );
     }
 
     @GetMapping("/my")
