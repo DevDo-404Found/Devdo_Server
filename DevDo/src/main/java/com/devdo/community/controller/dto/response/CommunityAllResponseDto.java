@@ -12,6 +12,7 @@ public record CommunityAllResponseDto(
         @JsonFormat(pattern = "yy/MM/dd HH:mm")
         LocalDateTime createdAt,
         Long viewCount,
+        Long likeCount,
         int commentCount // 댓글 개수
 ) {
     public static CommunityAllResponseDto from(Community community, int commentCount) {
@@ -22,6 +23,7 @@ public record CommunityAllResponseDto(
                 community.getTitle(),
                 community.getCreatedAt(),
                 community.getViewCount(),
+                community.getLikeCount(),
                 commentCount
         );
     }
