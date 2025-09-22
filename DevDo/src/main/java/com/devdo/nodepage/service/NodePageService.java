@@ -48,10 +48,23 @@ public class NodePageService {
         return mapToResponse(saved);
     }
 
-    @Transactional(readOnly = true)
-    public NodePageResponseDto get(Long nodeId) {
-        NodePage nodePage = nodePageRepository.findByNode_NodeId(nodeId)
+    @Transactional(readOnly = false)
+    public NodePageResponseDto getOrCreate(Long nodeId) {
+        Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NODE_NOT_FOUND_EXCEPTION, ErrorCode.NODE_NOT_FOUND_EXCEPTION.getMessage()));
+
+        // NodePage 존재 여부 확인
+        NodePage nodePage = nodePageRepository.findByNode_NodeId(nodeId)
+                .orElseGet(() -> {
+                    // 없으면 기본 값으로 생성
+                    NodePage newPage = NodePage.builder()
+                            .node(node)
+                            .content("")
+                            .emoji("")
+                            .pictureUrl(null)
+                            .build();
+                    return nodePageRepository.save(newPage);
+                });
 
         return mapToResponse(nodePage);
     }

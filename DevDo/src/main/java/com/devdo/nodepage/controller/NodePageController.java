@@ -33,9 +33,9 @@ public class NodePageController {
     }
 
     @GetMapping("/{nodeId}")
-    @Operation(method = "GET", summary = "노드 상세 페이지 조회", description = "노드 상세 페이지를 조회합니다.")
+    @Operation(method = "GET", summary = "노드 상세 페이지 조회", description = "노드 상세 페이지가 없으면 새로 생성 후 반환합니다.")
     public ApiResTemplate<NodePageResponseDto> getNodePage(@PathVariable Long nodeId) {
-        NodePageResponseDto response = nodePageService.get(nodeId);
+        NodePageResponseDto response = nodePageService.getOrCreate(nodeId);
         return ApiResTemplate.successResponse(SuccessCode.GET_SUCCESS, response);
     }
 
