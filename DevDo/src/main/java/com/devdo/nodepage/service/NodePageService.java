@@ -48,7 +48,7 @@ public class NodePageService {
         return mapToResponse(saved);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public NodePageResponseDto getOrCreate(Long nodeId) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NODE_NOT_FOUND_EXCEPTION, ErrorCode.NODE_NOT_FOUND_EXCEPTION.getMessage()));
@@ -103,7 +103,8 @@ public class NodePageService {
                 nodePage.getTitle(),
                 nodePage.getContent(),
                 nodePage.getEmoji(),
-                nodePage.getPictureUrl()
+                nodePage.getPictureUrl(),
+                nodePage.getNode().getRoadmap().getTitle()
         );
     }
 
