@@ -35,7 +35,14 @@ public class Roadmap {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "roadmap_sort_order")
+    private Integer sortOrder;
+
     public void updateTitle(String title) {
         this.title = title;
+    }
+
+    public void updateSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }

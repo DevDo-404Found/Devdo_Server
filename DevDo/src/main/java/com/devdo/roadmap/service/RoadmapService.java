@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -41,9 +42,17 @@ public class RoadmapService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND_EXCEPTION, ErrorCode.MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
+        // 마지막에 추가되도록 정렬 순서 업데이트
+        int lastSortOrder = roadmapRepository.findAllByMember_MemberId(memberId)
+                .stream()
+                .mapToInt(r -> r.getSortOrder() == null ? 0 : r.getSortOrder())
+                .max()
+                .orElse(0);
+
         Roadmap roadmap = Roadmap.builder()
                 .title(requestDto.title())
                 .member(member)
+                .sortOrder(lastSortOrder + 1)
                 .build();
 
         roadmapRepository.save(roadmap);
@@ -104,7 +113,7 @@ public class RoadmapService {
 
     @Transactional(readOnly = true)
     public List<RoadmapResponseDto> getMyRoadmaps(Long memberId) {
-        return roadmapRepository.findAllByMember_MemberId(memberId).stream()
+        return roadmapRepository.findAllByMember_MemberIdOrderBySortOrderAsc(memberId).stream()
                 .map(r -> RoadmapResponseDto.builder()
                         .roadmapId(r.getId())
                         .title(r.getTitle())
@@ -114,7 +123,7 @@ public class RoadmapService {
 
     @Transactional(readOnly = true)
     public List<RoadmapMainResponseDto> getMainRoadmaps(Long memberId) {
-        return roadmapRepository.findAllByMember_MemberId(memberId).stream()
+        return roadmapRepository.findAllByMember_MemberIdOrderBySortOrderAsc(memberId).stream()
                 .map(r -> RoadmapMainResponseDto.builder()
                         .roadmapId(r.getId())
                         .title(r.getTitle())
@@ -141,6 +150,32 @@ public class RoadmapService {
         Roadmap roadmap = roadmapRepository.findById(roadmapId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 로드맵이 존재하지 않습니다."));
         roadmap.updateTitle(newTitle);
+    }
+
+    @Transactional
+    public List<RoadmapResponseDto> updateRoadmapsOrder(Long memberId, List<Long> roadmapIds) {
+        List<Roadmap> userRoadmaps = roadmapRepository.findAllByMember_MemberId(memberId);
+
+        Map<Long, Roadmap> roadmapMap = userRoadmaps.stream()
+                .collect(Collectors.toMap(Roadmap::getId, r -> r));
+
+        for (int i = 0; i < roadmapIds.size(); i++) {
+            Long roadmapId = roadmapIds.get(i);
+            Roadmap roadmap = roadmapMap.get(roadmapId);
+
+            // 순서 정렬 업데이트
+            if (roadmap != null) {
+                roadmap.updateSortOrder(i + 1);
+            } else {
+                throw new BusinessException(ErrorCode.ROADMAP_NOT_FOUND_EXCEPTION,
+                        ErrorCode.ROADMAP_NOT_FOUND_EXCEPTION.getMessage());
+            }
+        }
+
+        return roadmapIds.stream()
+                .map(id -> roadmapMap.get(id))
+                .map(RoadmapResponseDto::from)
+                .collect(Collectors.toList());
     }
 
     @Transactional
