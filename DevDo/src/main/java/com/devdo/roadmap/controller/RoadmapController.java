@@ -1,5 +1,6 @@
 package com.devdo.roadmap.controller;
 
+import com.devdo.roadmap.controller.dto.request.RoadmapOrderReqDto;
 import com.devdo.roadmap.controller.dto.request.RoadmapRequestDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapDetailResponseDto;
 import com.devdo.roadmap.controller.dto.response.RoadmapMainResponseDto;
@@ -83,5 +84,12 @@ public class RoadmapController {
                               Principal principal) {
         Long memberId = Long.parseLong(principal.getName());
         roadmapService.deleteRoadmap(roadmapId, memberId);
+    }
+
+    @PutMapping("/reorder")
+    @Operation(summary = "로드맵 순서 변경", description = "사용자의 메인 로드맵 순서를 수정합니다.")
+    public List<RoadmapResponseDto> reorderRoadmaps(@RequestBody RoadmapOrderReqDto reqDto, Principal principal) {
+        Long memberId = Long.parseLong(principal.getName());
+        return roadmapService.updateRoadmapsOrder(memberId, reqDto.roadmapId());
     }
 }
