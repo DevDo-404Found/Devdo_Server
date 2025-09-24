@@ -161,12 +161,17 @@ public class CommunityService {
         // 자신 프로필 여부 확인
         boolean isMyProfile = loginMember.getMemberId().equals(toMember.getMemberId());
 
+        int followerCount = followRepository.countFollowers(toMember);
+        int followingCount = followRepository.countFollowings(toMember);
+
         return CommunityProfileResponseDto.from(
                 toMember,
                 community.getTitle(),
                 community.getCreatedAt(),
                 community.getViewCount(),
                 commentCount,
+                followerCount,
+                followingCount,
                 isFollowing,
                 isMyProfile ? true : null,
                 myCommunities
