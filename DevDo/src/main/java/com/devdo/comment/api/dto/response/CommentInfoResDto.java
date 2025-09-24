@@ -17,6 +17,7 @@ public record CommentInfoResDto(
         @JsonFormat(pattern = "yy/MM/dd HH:mm")
         LocalDateTime commentCreatedAt,
         String writerNickname,
+        Long memberId,
         String writerPictureUrl,
         Long commentCount,
         List<CommentInfoResDto> childComments
@@ -35,6 +36,7 @@ public record CommentInfoResDto(
                 comment.getContent(),
                 comment.getCommentCreatedAt(),
                 MemberInfoHelper.getMemberNickname(comment.getMember()),
+                comment.getMember().getMemberId(),
                 MemberInfoHelper.getMemberPictureUrl(comment.getMember()),
                 comment.getCommunity().getCommentCount(),
                 childComments
