@@ -36,4 +36,18 @@ public record MemberInfoResDto(
     public static MemberInfoResDto from(Member member) {
         return MemberInfoResDto.from(member, null, true);
     }
+
+    public static MemberInfoResDto from(Member member, int followerCount, int followingCount, Boolean isFollowing, Boolean isMyProfile) {
+        return MemberInfoResDto.builder()
+                .memberId(member.getMemberId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .pictureUrl(member.getPictureUrl())
+                .socialType(member.getSocialType())
+                .followerCount(followerCount)
+                .followingCount(followingCount)
+                .isFollowing(isFollowing)
+                .isMyProfile(isMyProfile)
+                .build();
+    }
 }
