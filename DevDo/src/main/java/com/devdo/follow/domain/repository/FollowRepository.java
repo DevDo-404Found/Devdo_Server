@@ -26,4 +26,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     int countFollowings(@Param("member") Member member);
     @Query("SELECT COUNT(f) FROM Follow f WHERE f.toMember = :member AND f.fromMember.isDeleted = false")
     int countFollowers(@Param("member") Member member);
+
+    void deleteAllByFromMemberOrToMember(Member fromMember, Member toMember);
 }

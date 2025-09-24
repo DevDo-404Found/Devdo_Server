@@ -24,7 +24,8 @@ public record CommunityProfileResponseDto(
         List<CommunityAllResponseDto> myCommunities
 ) {
     public static CommunityProfileResponseDto from(Member member, String title, LocalDateTime createdAt,
-                                                   Long viewCount, int commentCount, boolean isFollowing,
+                                                   Long viewCount, int commentCount,
+                                                   int followerCount, int followingCount, boolean isFollowing,
                                                    Boolean isMyProfile,
                                                    List<CommunityAllResponseDto> myCommunities) {
         return new CommunityProfileResponseDto(
@@ -35,8 +36,8 @@ public record CommunityProfileResponseDto(
                 createdAt,
                 viewCount,
                 commentCount,
-                member.getFollowerCount(),
-                member.getFollowingCount(),
+                followerCount,
+                followingCount,
                 isFollowing,
                 isMyProfile,
                 myCommunities
