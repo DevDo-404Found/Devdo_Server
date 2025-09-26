@@ -25,9 +25,9 @@ public class FollowController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
     @PostMapping("/follow")
-    public ApiResTemplate<String> follow(@RequestParam Long toMemberId, Principal principal) {
-        followService.follow(toMemberId, principal);
-        return ApiResTemplate.successWithNoContent(SuccessCode.FOLLOW_SUCCESS);
+    public ApiResTemplate<FollowResDto> follow(@RequestParam Long toMemberId, Principal principal) {
+        FollowResDto followResDto = followService.follow(toMemberId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.FOLLOW_SUCCESS, followResDto);
     }
 
     @Operation(summary = "언팔로우 요청", description = "로그인한 사용자가 다른 사람에게 언팔로우 요청을 보냅니다.")
@@ -36,9 +36,9 @@ public class FollowController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
     @DeleteMapping("/unfollow")
-    public ApiResTemplate<String> unfollow(@RequestParam Long toMemberId, Principal principal) {
-        followService.unfollow(toMemberId, principal);
-        return ApiResTemplate.successWithNoContent(SuccessCode.FOLLOW_DELETE_SUCCESS);
+    public ApiResTemplate<FollowResDto> unfollow(@RequestParam Long toMemberId, Principal principal) {
+        FollowResDto followResDto = followService.unfollow(toMemberId, principal);
+        return ApiResTemplate.successResponse(SuccessCode.FOLLOW_DELETE_SUCCESS, followResDto);
     }
 
     @Operation(summary = "팔로잉 조회", description = "로그인한 사용자가 자신 or 다른 사람의 팔로잉 리스트를 memberId로 판별해 조회합니다.")

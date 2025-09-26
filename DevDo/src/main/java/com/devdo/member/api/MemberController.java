@@ -46,4 +46,16 @@ public class MemberController {
         MemberInfoResDto memberInfoResDto = memberService.updateMemberInfo(memberInfoUpdateReqDto, principal);
         return ApiResTemplate.successResponse(SuccessCode.MEMBER_INFO_UPDATE_SUCCESS, memberInfoResDto);
     }
+
+    @Operation(summary = "회원 탈퇴", description = "로그인한 사용자가 회원 탈퇴를 통해 자신의 정보를 삭제합니다." +
+            "\n 해당 사용자가 작성한 게시글, 댓글은 삭제되지 않으며 닉네임(탈퇴한 회원)으로 탈퇴 여부를 구분할 수 있습니다. ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "응답 생성에 성공하였습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    })
+    @DeleteMapping
+    public ApiResTemplate<String> deleteMember(Principal principal) {
+        memberService.deleteMember(principal);
+        return ApiResTemplate.successWithNoContent(SuccessCode.MEMBER_DELETE_SUCCESS);
+    }
 }

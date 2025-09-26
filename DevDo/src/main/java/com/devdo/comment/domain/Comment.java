@@ -37,6 +37,7 @@ public class Comment {
     자식 댓글 리스트 - 여러 개의 자식 댓글이 하나의 부모 댓글에 달릴 수 있다.
      */
     @OneToMany(mappedBy = "parentComment", orphanRemoval = true)
+    @OrderBy("commentCreatedAt ASC")
     private List<Comment> childComments = new ArrayList<>();
 
     // 한 명의 사용자는 여러 개의 댓글을 작성할 수 있다.

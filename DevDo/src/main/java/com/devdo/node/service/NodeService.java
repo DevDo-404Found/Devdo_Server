@@ -74,11 +74,11 @@ public class NodeService {
     }
 
     @Transactional(readOnly = true)
-    public NodeResponseDto getNodeDetail(Long nodeId) {
+    public NodeDetailResponseDto getNodeDetail(Long nodeId) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NODE_NOT_FOUND_EXCEPTION, ErrorCode.NODE_NOT_FOUND_EXCEPTION.getMessage()));
 
-        return NodeResponseDto.from(node);
+        return NodeDetailResponseDto.from(node);
     }
 
     public NodeDetailResponseDto updateNode(Principal principal, Long nodeId, NodeDetailResponseDto nodeDetailResponseDto) {

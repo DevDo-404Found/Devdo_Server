@@ -45,6 +45,7 @@ public class Node {
 
     // 자식 노드
     @OneToMany(mappedBy = "parentNode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Node> children = new ArrayList<>();
 
     @OneToOne(mappedBy = "node", cascade = CascadeType.ALL, orphanRemoval = true)

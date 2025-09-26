@@ -2,6 +2,7 @@ package com.devdo.member.application;
 
 import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
+import com.devdo.follow.domain.repository.FollowRepository;
 import com.devdo.member.api.dto.request.MemberInfoUpdateReqDto;
 import com.devdo.member.api.dto.response.MemberInfoResDto;
 import com.devdo.member.domain.Member;
@@ -18,13 +19,17 @@ import java.security.Principal;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final FollowRepository followRepository;
 
     // 마이페이지 - 내 프로필 조회
     public MemberInfoResDto getMemberInfo(Principal principal) {
         Long id = Long.parseLong(principal.getName());
         Member member = getMemberById(id);
 
-        return MemberInfoResDto.from(member);
+        int followerCount = followRepository.countFollowers(member);
+        int followingCount = followRepository.countFollowings(member);
+
+        return MemberInfoResDto.from(member, followerCount, followingCount, null, true);
     }
 
     // 마이페이지 - 내 프로필 수정
@@ -54,6 +59,19 @@ public class MemberService {
         }
 
         return MemberInfoResDto.from(member);
+    }
+
+    // 회원 탈퇴 - soft delete 방식
+    @Transactional
+    public void deleteMember(Principal principal) {
+        Long id = Long.parseLong(principal.getName());
+        Member member = getMemberById(id);
+
+        // 팔로우 관계 끊기
+        followRepository.deleteAllByFromMemberOrToMember(member, member);
+
+        // soft delete
+        member.deleteMember();
     }
 
     // entity 찾는 공통 메소드

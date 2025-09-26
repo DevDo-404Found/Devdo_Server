@@ -55,12 +55,12 @@ public class ScrapService {
     }
 
     @Transactional
-    public Long saveScrap(Long id, Principal principal) {
+    public ScrapResponseDto saveScrap(Long id, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
         Community community = findCommunityById(id);
 
         if (scrapRepository.existsByMemberAndCommunity(member, community)) {
-            throw new BusinessException(ErrorCode.ALREADY_EXISTS_EMAIL, "이미 스크랩한 게시글입니다.");
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS_SCRAP, "이미 스크랩한 게시글입니다.");
         }
 
         Scrap scrap = Scrap.builder()
@@ -69,21 +69,24 @@ public class ScrapService {
                 .build();
 
         community.increaseScrapCount();
+        scrapRepository.save(scrap);
 
-        return scrapRepository.save(scrap).getId();
+        return ScrapResponseDto.of(community, true); // 스크랩 상태 true
     }
 
     @Transactional
-    public void deletesScrap(Long communityId, Principal principal) {
+    public ScrapResponseDto deleteScrap(Long communityId, Principal principal) {
         Member member = getMemberFromPrincipal(principal);
         Community community = findCommunityById(communityId);
 
         Scrap scrap = scrapRepository.findByMemberAndCommunity(member, community)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION, ErrorCode.NO_AUTHORIZATION_EXCEPTION.getMessage()));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NO_AUTHORIZATION_EXCEPTION,
+                        ErrorCode.NO_AUTHORIZATION_EXCEPTION.getMessage()));
 
         community.decreaseScrapCount();
-
         scrapRepository.delete(scrap);
+
+        return ScrapResponseDto.of(community, false); // 스크랩 상태 false
     }
 
     @Transactional(readOnly = true)

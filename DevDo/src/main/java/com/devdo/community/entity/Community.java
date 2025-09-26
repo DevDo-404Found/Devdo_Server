@@ -20,7 +20,7 @@ import java.util.List;
 public class Community {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -46,6 +46,9 @@ public class Community {
     @Column(name = "scrap_count", nullable = false)
     private Long scrapCount;
 
+    @Column(name = "comment_count", nullable = false)
+    private Long commentCount;
+
     @OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Scrap> scraps = new ArrayList<>();
 
@@ -67,6 +70,9 @@ public class Community {
         if (this.scrapCount == null) {
             this.scrapCount = 0L;
         }
+        if (this.commentCount == null) {
+            this.commentCount = 0L;
+        }
     }
 
     // 스크랩 개수 관련
@@ -86,6 +92,11 @@ public class Community {
     // 좋아요 개수 관련
     public void updateLikeCount(int count) {
         this.likeCount = Math.max(0, this.likeCount + count);
+    }
+
+    // 댓글 개수 관련
+    public void updateCommentCount(int count) {
+        this.commentCount = Math.max(0, this.commentCount + count);
     }
 
     public void update(CommunityRequestDto commnuityRequestDto) {

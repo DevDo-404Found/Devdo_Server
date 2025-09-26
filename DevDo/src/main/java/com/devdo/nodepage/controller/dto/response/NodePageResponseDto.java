@@ -5,6 +5,7 @@ public record NodePageResponseDto(
         String title,
         String content,
         String emoji,
-        String pictureUrl
+        String pictureUrl,
+        String roadmapTitle
 ) {
 }

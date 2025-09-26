@@ -43,3 +43,15 @@ kakao:
 gemini:
   api:
     key: ${gemini.api.key}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

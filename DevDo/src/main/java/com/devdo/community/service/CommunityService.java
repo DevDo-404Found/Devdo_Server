@@ -5,8 +5,12 @@ import com.devdo.common.error.ErrorCode;
 import com.devdo.common.exception.BusinessException;
 import com.devdo.community.controller.dto.request.CommunityRequestDto;
 import com.devdo.community.controller.dto.response.CommunityAllResponseDto;
+import com.devdo.community.controller.dto.response.CommunityDetailResponseDto;
+import com.devdo.community.controller.dto.response.CommunityProfileResponseDto;
 import com.devdo.community.entity.Community;
 import com.devdo.community.repository.CommunityRepository;
+import com.devdo.follow.domain.repository.FollowRepository;
+import com.devdo.like.domain.repository.LikeRepository;
 import com.devdo.member.domain.Member;
 import com.devdo.member.domain.repository.MemberRepository;
 import com.devdo.scrap.repository.ScrapRepository;
@@ -28,6 +32,8 @@ public class CommunityService {
     private final ScrapRepository scrapRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
+    private final FollowRepository followRepository;
 
     // 공통 메서드
     @Transactional
@@ -133,6 +139,48 @@ public class CommunityService {
     }
 
     @Transactional(readOnly = true)
+    public CommunityProfileResponseDto getCommunityProfile(Long communityId, Principal principal) {
+        Community community = findCommunityById(communityId);
+        Member loginMember = getMemberFromPrincipal(principal);
+        Member toMember = community.getMember();
+        int commentCount = commentRepository.countByCommunity_Id(communityId);
+
+        // 작성자가 쓴 글 모두 조회
+        List<CommunityAllResponseDto> myCommunities = communityRepository
+                .findAllByMember_MemberId(toMember.getMemberId())
+                .stream()
+                .map(c -> {
+                    int cmtCount = commentRepository.countByCommunity_Id(c.getId());
+                    return CommunityAllResponseDto.from(c, cmtCount);
+                })
+                .toList();
+
+        // 팔로우 여부 확인
+        boolean isFollowing = followRepository.existsByFromMemberAndToMember(loginMember, toMember);
+
+        // 자신 프로필 여부 확인
+        boolean isMyProfile = loginMember.getMemberId().equals(toMember.getMemberId());
+
+        int followerCount = followRepository.countFollowers(toMember);
+        int followingCount = followRepository.countFollowings(toMember);
+
+        return CommunityProfileResponseDto.from(
+                toMember,
+                community.getTitle(),
+                community.getCreatedAt(),
+                community.getViewCount(),
+                commentCount,
+                followerCount,
+                followingCount,
+                isFollowing,
+                isMyProfile ? true : null,
+                myCommunities
+        );
+    }
+
+
+
+    @Transactional(readOnly = true)
     public List<CommunityAllResponseDto> searchCommunitiesByTitle(String keyword) {
         List<Community> communities = communityRepository.findByTitleContainingIgnoreCase(keyword);
 
@@ -167,5 +215,24 @@ public class CommunityService {
             stringRedisTemplate.opsForValue().set(redisKey, "1", Duration.ofHours(24));
         }
         return community;
+    }
+
+    // 커뮤니티 게시글 상세 조회 (좋아요 상태, redis 반영)
+    @Transactional
+    public CommunityDetailResponseDto getCommunityDetail(Long communityId, Principal principal) {
+        Member member = getMemberFromPrincipal(principal);
+        Community community = getCommunityWithRedisViewCount(communityId, principal);
+
+        int commentCount = commentRepository.countByCommunity_Id(communityId);
+
+        boolean isLiked = false;
+        boolean isScrapped = false;
+
+        if (member != null) {
+            isLiked = likeRepository.existsByMemberAndCommunity(member, community);
+            isScrapped = scrapRepository.existsByMemberAndCommunity(member, community);
+        }
+
+        return CommunityDetailResponseDto.from(community, commentCount, isLiked, isScrapped);
     }
 }
